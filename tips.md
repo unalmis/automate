@@ -91,25 +91,44 @@ You may find the `mokutil --help` command helpful.
 
 ## Pairing Apple airpods with Linux machines
 
-The initial pairing process with Linux machines currently has a bug. Below is a
-patch that actually works. You only have to do this when pairing airpods for
-the first time.
+The initial pairing process with Linux machines has a bug. To connect them,
+follow these instructions. You only have to do this when pairing for the first
+time.
+
+Before continuing, turn off bluetooth on Apple devices so they don't hijack the
+connection. Also close your airpods in their case.
+
+If you have previously attempted to pair airpods, you need to remove the device
+from bluetooth connections list.
 
 ```sh
-# turn off bluetooth on Apple devices so they don't hijack the connection
-# put airpods back in case
-# turn off bluetooth on Linux machine
-
-# uncomment ControllerMode = dual
-# change 'dual' to 'bredr'
-sudo nano /etc/bluetooth/main.conf
-
-# turn on bluetooth on Linux machine
-# pair airpods then put airpods back in case
-# turn off bluetooth on Linux machine
-# revert your changes
-sudo nano /etc/bluetooth/main.conf
+bluetoothctl
+[bluetooth]# devices
+# you should see a list of bluetooth devices with a KEY delemited by colons.
+[bluetooth]# remove KEY
+[bluetooth]# exit
 ```
+
+Now we will edit the bluetooth configuration file.
+
+```sh
+# Turn off bluetooth.
+sudo nano /etc/bluetooth/main.conf
+# uncomment the line with 'ControllerMode = dual' by removing leading hashtag
+# change 'dual' to 'bredr'
+# (you can exit nano with: ctrl+o, enter, then ctrl+x)
+# Log out and turn on bluetooth on next log in.
+```
+
+You may now pair your airpods using the settings GUI. After a successful
+connection, disconnect your airpods and close them in their case. Revert your
+changes to the bluetooth configuration file and restart bluetooth.
+
+From now on, Airpods should connect automatically. You should not need to edit
+the bluetooth configuration file again.
+
+To use airpods as both speakers and microphone, make sure to enable them as both
+output and input devices under sound in the settings GUI.
 
 ---
 
