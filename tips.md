@@ -59,11 +59,15 @@ sudo dnf install akmod-nvidia
 reboot
 ```
 
-The signing key should stay there until you delete it from MOK management or
-perhaps reset the UEFI to defaults. The Nvidia drivers should (in theory) get
-signed automatically after any driver or kernel update.
+The signing key will stay there until you delete it from MOK management or reset
+the secure boot keys to defaults in UEFI. The Nvidia drivers should (in theory)
+get signed automatically after any driver or kernel upgrade.
 
-### Back up keys
+Note that new kernels may drop support for old drivers. This would cause the
+Nvidia drivers to fail building on the new kernel. To minimize risk, delay
+kernel upgrades.
+
+### Back up keys (optional)
 
 Make encrypted backups of the
 1. private key in `/etc/pki/akmods/private/`
@@ -92,19 +96,19 @@ You may find the `mokutil --help` command helpful.
 ## Pairing Apple airpods with Linux machines
 
 The initial pairing process with Linux machines has a bug. To connect them,
-follow these instructions. You only have to do this when pairing for the first
+follow these instructions. This only needs to be done once.
 time.
 
 Before continuing, turn off bluetooth on Apple devices so they don't hijack the
 connection. Also close your airpods in their case.
 
-If you have previously attempted to pair airpods, you need to remove the device
-from bluetooth connections list.
+If you have previously attempted to pair your airpods, you need to remove them
+from the bluetooth connections list.
 
 ```sh
 bluetoothctl
 [bluetooth]# devices
-# you should see a list of bluetooth devices with a KEY delemited by colons.
+# A list of bluetooth devices with a KEY delemited by colons should be shown.
 [bluetooth]# remove KEY
 [bluetooth]# exit
 ```
@@ -114,21 +118,21 @@ Now we will edit the bluetooth configuration file.
 ```sh
 # Turn off bluetooth.
 sudo nano /etc/bluetooth/main.conf
-# uncomment the line with 'ControllerMode = dual' by removing leading hashtag
-# change 'dual' to 'bredr'
-# (you can exit nano with: ctrl+o, enter, then ctrl+x)
+# Uncomment the line with 'ControllerMode = dual' by removing leading hashtag.
+# Change 'dual' to 'bredr'.
+# You can exit nano (the text editor) with ctrl+o, enter, then ctrl+x.
 # Log out and turn on bluetooth on next log in.
 ```
 
 You may now pair your airpods using the settings GUI. After a successful
-connection, disconnect your airpods and close them in their case. Revert your
+connection, disconnect your airpods and close them in their case. Revert the
 changes to the bluetooth configuration file and restart bluetooth.
 
-From now on, Airpods should connect automatically. You should not need to edit
-the bluetooth configuration file again.
+From now on, your airpods should connect automatically. You should not need to
+edit the bluetooth configuration file again.
 
-To use airpods as both speakers and microphone, make sure to enable them as both
-output and input devices under sound in the settings GUI.
+To use your airpods as both speakers and microphone, make sure to enable them as
+both output and input devices under sound in the settings GUI.
 
 ---
 
@@ -194,3 +198,16 @@ ln -s "${HOME}/Documents/project/automate/replace.sh" "${HOME}/.local/bin/replac
 - [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin-ubo)
     - Enable `AdGuard Annoyances` and `uBlock filters - Annoyances` filters
 - [Zotero connector](https://www.zotero.org/download/connectors)
+
+## Progressive web apps
+
+Chromium supports [progressive web apps](https://en.wikipedia.org/wiki/Progressive_web_app).
+You may find it convenient to install the following as progressive web apps.
+
+- Gmail
+- Instagram
+- Linked In
+- Outlook
+- Snapchat
+- Spotify
+- Whats App
