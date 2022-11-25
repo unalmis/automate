@@ -171,7 +171,7 @@ ln -s "${HOME}/Documents/project/automate/replace.sh" "${HOME}/.local/bin/replac
 ## Recommended web browser extensions
 
 - [Bitwarden](https://bitwarden.com/download/)
-- [old reddit redirect](https://github.com/tom-james-watson/old-reddit-redirect)
-- [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin)
+- [old reddit redirect](https://github.com/tom-james-watson/old-reddit-redirect#old-reddit-redirect)
+- [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin-ubo)
     - Enable `AdGuard Annoyances` and `uBlock filters - Annoyances` filters
 - [Zotero connector](https://www.zotero.org/download/connectors)
