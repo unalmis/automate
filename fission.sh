@@ -523,21 +523,22 @@ install_apps() {
      8) Extensions              manage Gnome extensions
      9) Flatseal                manage flatpak permissions
     10) Foliate                 ebook viewer
-    11) IntelliJ                Java IDE
-    12) Kdenlive                video editor
-    13) PyCharm                 Python IDE
-    14) Signal                  messaging (open source, encrypted)
-    15) Slack                   messaging (proprietary)
-    16) VLC                     reliable media player
-    17) Zoom                    video conferencing
-    18) Bitwarden               password manager (recommended)
-    19) Master PDF editor       portable document format file editor
-    20) Matlab                  scientific computing software
-    21) Mathematica             scientific computing software
-    22) Miniconda               programming environment and package manager
-    23) Night theme switcher    automatically toggle light and dark theme
-    24) Proton VPN              virtual private network
-    25) Zotero                  research assistant
+    11) Gimp                    image editor
+    12) IntelliJ                Java IDE
+    13) Kdenlive                video editor
+    14) PyCharm                 Python IDE
+    15) Signal                  messaging (open source, encrypted)
+    16) Slack                   messaging (proprietary)
+    17) VLC                     reliable media player
+    18) Zoom                    video conferencing
+    19) Bitwarden               password manager (recommended)
+    20) Master PDF editor       portable document format file editor
+    21) Matlab                  scientific computing software
+    22) Mathematica             scientific computing software
+    23) Miniconda               programming environment and package manager
+    24) Night theme switcher    automatically toggle light and dark theme
+    25) Proton VPN              virtual private network
+    26) Zotero                  research assistant
 
 INSTALL_LIST
 
@@ -572,6 +573,7 @@ INSTALL_LIST
         flatpak install flathub org.gnome.Extensions
         flatpak install flathub com.github.tchx84.Flatseal
         flatpak install flathub com.github.johnfactotum.Foliate
+        flatpak install flathub org.gimp.GIMP
         flatpak install flathub com.jetbrains.IntelliJ-IDEA-Community
         flatpak install flathub org.kde.kdenlive
         is_installed 'pycharm-community' || flatpak install flathub com.jetbrains.PyCharm-Community
@@ -584,6 +586,7 @@ INSTALL_LIST
         sudo snap install clion --classic
         sudo snap install discord
         sudo snap install foliate
+        sudo snap install gimp
         sudo snap install intellij-idea-community --classic
         sudo snap install kdenlive
         is_installed 'pycharm-community' || sudo snap install pycharm-community --classic
