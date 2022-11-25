@@ -79,8 +79,6 @@ Make encrypted backups of the
 If you decide to remove the `akmod-nvidia` package, you should also delete the
 signing key.
 
-You may find the `mokutil --help` command helpful.
-
 1. The output of `mokutil --list-enrolled` shows the enrolled keys in order
 2. If the akmod key was labeled key 2, its key number should be `0002`
 3. Mark the akmod key for deletion
@@ -88,8 +86,8 @@ You may find the `mokutil --help` command helpful.
     - `sudo mokutil --delete MOK-0002.der` would mark key 2 for deletion
     - Create a password which you will later use to delete the key
 4. On reboot, MOK management will appear
-    - The numbering of the keys in MOK management may differ from step 1, so you
-    should remember some of the akmod key's details to delete the correct key
+    - The numbering of the keys in MOK management differs from step 1, so try to
+    remember an identifying detail of the akmod key to delete the correct key
 
 ---
 
@@ -136,11 +134,45 @@ both output and input devices under sound in the settings GUI.
 
 ---
 
+## Recommended web browser extensions
+
+- [Bitwarden](https://bitwarden.com/download/)
+- [old reddit redirect](https://github.com/tom-james-watson/old-reddit-redirect#old-reddit-redirect)
+- [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin-ubo)
+    - Enable `AdGuard Annoyances` and `uBlock filters - Annoyances` filters
+- [Zotero connector](https://www.zotero.org/download/connectors)
+
+---
+
+## Recommended web apps
+
+Chromium supports [progressive web apps](https://en.wikipedia.org/wiki/Progressive_web_app).
+
+If a website has a PWA, a prompt to install it will show in the url bar.
+Otherwise, you can make a web app with `Customize and control Chromium` ->
+`More tools` -> `Create shortcut`.
+
+An advantage of web apps is that they remain sandboxed. Extensions like uBlock
+Origin will also work in them. For the Spotify web app, this means playback
+lacks ads.
+
+- [Gmail](https://mail.google.com/mail/u/0/#inbox)
+- [GroupMe](https://web.groupme.com/)
+- [Instagram](https://www.instagram.com/)
+- [LinkedIn](https://www.linkedin.com/)
+- [Outlook](https://outlook.office.com/mail/)
+- [Snapchat](https://web.snapchat.com/)
+- [Spotify](https://open.spotify.com/)
+- [WhatsApp](https://web.whatsapp.com/)
+
+---
+
 ## File security
 
 Some versions of Windows OS set the executable bit on files by default.
 This is bad for security.
-You should check that only files you plan to execute have this permission.
+
+Check that only files you plan to execute have this permission.
 
 ```sh
 # find all executable files in the current directory, recursively
@@ -188,26 +220,3 @@ ln -s "${HOME}/Documents/project/automate/mitosis.sh" "${HOME}/.local/bin/mitosi
 ln -s "${HOME}/Documents/project/automate/pull.sh" "${HOME}/.local/bin/pull.sh"
 ln -s "${HOME}/Documents/project/automate/replace.sh" "${HOME}/.local/bin/replace.sh"
 ```
-
----
-
-## Recommended web browser extensions
-
-- [Bitwarden](https://bitwarden.com/download/)
-- [old reddit redirect](https://github.com/tom-james-watson/old-reddit-redirect#old-reddit-redirect)
-- [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin-ubo)
-    - Enable `AdGuard Annoyances` and `uBlock filters - Annoyances` filters
-- [Zotero connector](https://www.zotero.org/download/connectors)
-
-## Progressive web apps
-
-Chromium supports [progressive web apps](https://en.wikipedia.org/wiki/Progressive_web_app).
-You may find it convenient to install the following as progressive web apps.
-
-- Gmail
-- Instagram
-- Linked In
-- Outlook
-- Snapchat
-- Spotify
-- Whats App
