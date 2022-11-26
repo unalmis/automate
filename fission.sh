@@ -115,6 +115,23 @@ set_manager_priority() {
 
 # ------------------------------------------------------------------------------
 
+# good for security
+enable_firewall() {
+    if is_installed 'firewalld'; then
+        # https://docs.fedoraproject.org/en-US/quick-docs/firewalld/#starting-firewalld-fedora
+        if ! firewall-cmd -q --state; then
+            printf '%s\n' 'Enabling the firewall...'
+            sudo systemctl enable firewalld
+        fi
+    elif is_installed 'ufw'; then
+        printf '%s\n' 'Checking if firewall is active...'
+        if sudo ufw status | grep -q --word-regexp 'inactive'; then
+            printf '%s\n' 'Enabling the firewall...'
+            sudo ufw enable
+        fi
+    fi
+}
+
 set_battery_charge_thresholds() {
     # https://support.system76.com/articles/laptop-battery-thresholds/
     # Linux kernel API states these files control charge thresholds.
@@ -167,35 +184,46 @@ BATTERY
     printf '%s\n' "$hi" | sudo tee "$control_hi" 1>/dev/null 2>/dev/null
 }
 
-tweak_settings() {
+tweak_git() {
+    is_installed 'git' || return 0
+
+    printf '%s\n' 'Default git branch set to main'
+    git config --global init.defaultBranch main
+    printf '%s\n' 'Git fetch with prune'
+    git config --global fetch.prune true
+    printf '%s\n' 'Fast forward git pull only'
+    git config --global pull.ff only
+    if prompt_yes 'Sign git commits automatically?'; then
+        git config --global commit.gpgsign true
+        # git config --global user.signingkey KEY
+        # You can find your KEY using the below command.
+        # gpg --list-secret-keys --keyid-format=long
+    fi
+    if prompt_yes 'Set global git commit credentials?'; then
+        printf 'Enter your git commit username: '
+        read -r git_username
+        git config --global user.name "$git_username"
+        printf 'Enter your git commit email: '
+        read -r git_email
+        git config --global user.email "$git_email"
+    fi
     printf '\n'
+}
 
-    # firewall is good for security
-    if is_installed 'firewalld'; then
-        # https://docs.fedoraproject.org/en-US/quick-docs/firewalld/#starting-firewalld-fedora
-        if ! firewall-cmd -q --state; then
-            printf '%s\n' 'Enabling the firewall...'
-            sudo systemctl enable firewalld
-        fi
-    elif is_installed 'ufw'; then
-        printf '%s\n' 'Checking if firewall is active...'
-        if sudo ufw status | grep -q --word-regexp 'inactive'; then
-            printf '%s\n' 'Enabling the firewall...'
-            sudo ufw enable
-        fi
-    fi
+tweak_gnome() {
+    is_installed 'gnome-shell' || return 0
 
-    if is_installed 'gnome-shell'; then
-        printf '%s\n' 'Applications menu sorted'
-        gsettings set org.gnome.shell app-picker-layout '[]'
-        printf '%s\n' 'File history retention reduced to 30 days'
-        gsettings set org.gnome.desktop.privacy recent-files-max-age 30
-        printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
-        gsettings set org.gnome.desktop.privacy remove-old-trash-files true
-        gsettings set org.gnome.desktop.privacy remove-old-temp-files true
-        printf '\n'
-    fi
+    printf '%s\n' 'Applications menu sorted'
+    gsettings set org.gnome.shell app-picker-layout '[]'
+    printf '%s\n' 'File history retention reduced to 30 days'
+    gsettings set org.gnome.desktop.privacy recent-files-max-age 30
+    printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
+    gsettings set org.gnome.desktop.privacy remove-old-trash-files true
+    gsettings set org.gnome.desktop.privacy remove-old-temp-files true
+    printf '\n'
+}
 
+tweak_text_editor() {
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
         printf '%s\n' 'Text editor set to show line numbers'
         gsettings set org.gnome.TextEditor show-line-numbers true
@@ -214,32 +242,15 @@ tweak_settings() {
         printf '%s\n%s\n%s\n' 'set tabsize 4' 'set tabstospaces' 'set trimblanks' \
             >"${HOME}/.nanorc"
     fi
+}
 
-    # git configuration
-    if is_installed 'git'; then
-        printf '%s\n' 'Default git branch set to main'
-        git config --global init.defaultBranch main
-        printf '%s\n' 'Git fetch with prune'
-        git config --global fetch.prune true
-        printf '%s\n' 'Fast forward git pull only'
-        git config --global pull.ff only
-        if prompt_yes 'Sign git commits automatically?'; then
-            git config --global commit.gpgsign true
-            # git config --global user.signingkey KEY
-            # You can find your KEY using the below command.
-            # gpg --list-secret-keys --keyid-format=long
-        fi
-        if prompt_yes 'Set global git commit credentials?'; then
-            printf 'Enter your git commit username: '
-            read -r git_username
-            git config --global user.name "$git_username"
-            printf 'Enter your git commit email: '
-            read -r git_email
-            git config --global user.email "$git_email"
-        fi
-        printf '\n'
-    fi
-
+# driver function that calls subroutines
+tweak_settings() {
+    printf '\n'
+    enable_firewall
+    tweak_git
+    tweak_gnome
+    tweak_text_editor
     set_battery_charge_thresholds
 }
 
@@ -444,6 +455,10 @@ install_miniconda() {
 
 # https://extensions.gnome.org/extension/2236/night-theme-switcher/
 install_night_theme_switcher() {
+    # https://gitlab.com/rmnvgr/nightthemeswitcher-gnome-shell-extension
+    # #something-doesnt-work-on-ubuntu
+    grep -q 'ID=ubuntu' '/etc/os-release' && return 0 # Ubuntu is not supported.
+
     app_uuid='nightthemeswitcher@romainvigier.fr'
     if is_installed 'gnome extension' "$app_uuid"; then
         if gnome-extensions info "$app_uuid" | grep -q --ignore-case 'state: initialized'; then
