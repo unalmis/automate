@@ -6,7 +6,7 @@ Below is a collection of tips and guides that may be useful.
 
 ## Nvidia drivers with secure boot on Fedora 36+
 
-This guide is based on the following sources:
+This guide is based on the following sources.
 
 - [RPM Fusion configuration](https://rpmfusion.org/Configuration/)
 - [RPM Fusion secure boot](https://rpmfusion.org/Howto/Secure%20Boot)
@@ -21,7 +21,7 @@ have proprietary Nvidia drivers installed.
 # ensure secure boot is enabled
 fwupdmgr security
 
-# if it is not already enabled, enable rpm fusion nonfree repository
+# If it is not already enabled, enable rpm fusion nonfree repository.
 sudo dnf install https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 sudo dnf group upgrade core
 ```
@@ -32,7 +32,7 @@ sudo dnf install akmods
 # Now there should be instructions in '/usr/share/doc/akmods/README.secureboot'.
 # Read it to ensure the instructions I am providing are not out of date.
 
-# generate a signing key
+# create the self generated key and certificate
 sudo kmodgenca -a
 
 # Enroll the key with a secure password.
@@ -40,7 +40,7 @@ sudo kmodgenca -a
 # (need to use sudo)
 sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
-# On next boot, MOK Management is launched.
+# On next boot, MOK management is launched.
 # Choose 'Enroll MOK' then 'Continue' to enroll the key.
 # Confirm enrollment by selecting 'Yes'.
 # Enter the password generated above.
@@ -95,7 +95,6 @@ signing key.
 
 The initial pairing process with Linux machines has a bug. To connect them,
 follow these instructions. This only needs to be done once.
-time.
 
 Before continuing, turn off bluetooth on Apple devices so they don't hijack the
 connection. Also close your airpods in their case.
