@@ -300,7 +300,7 @@ upgrade_system() {
 
 # ------------------------------------------------------------------------------
 
-# only get password manager from official upstream source
+# https://bitwarden.com/
 install_bitwarden() {
     if [ "$USE_SNAP" = 'True' ]; then
         sudo snap install bitwarden
@@ -323,7 +323,7 @@ install_bitwarden() {
     fi
 }
 
-# a flatpak exists, but it doesn't work well
+# https://code-industry.net/masterpdfeditor/
 install_master_pdf_editor() {
     if is_installed 'masterpdfeditor5' \
         || ! prompt_yes 'Install Master PDF editor? (needs license)'; then
@@ -505,6 +505,7 @@ install_proton_vpn() {
     fi
 }
 
+# https://www.zotero.org/
 install_zotero() {
     oxt_name='Zotero_OpenOffice_Integration.oxt'
     if [ "$USE_FLAT" = 'True' ] && flatpak install flathub org.zotero.Zotero; then
@@ -529,10 +530,10 @@ install_apps() {
     I will prompt you to install the following.
 
      1) media codecs            enables playing various videos (recommended)
-     2) qPDF                    CLI tool for PDF files
-     3) Red Hat fonts           nice fonts
-     4) uBlock Origin           ad content blocker (recommended)
-     5) Chromium                web browser
+     2) Chromium                web browser
+     3) qPDF                    CLI tool for PDF files
+     4) Texmaker                Latex editor
+     5) uBlock Origin           ad content blocker (recommended)
      6) CLion                   C and C++ IDE
      7) Discord                 messaging (proprietary)
      8) Extensions              manage Gnome extensions
@@ -546,14 +547,14 @@ install_apps() {
     16) Slack                   messaging (proprietary)
     17) VLC                     reliable media player
     18) Zoom                    video conferencing
-    19) Bitwarden               password manager (recommended)
+    19) Bitwarden               password manager
     20) Master PDF editor       portable document format file editor
     21) Matlab                  scientific computing software
     22) Mathematica             scientific computing software
     23) Miniconda               programming environment and package manager
     24) Night theme switcher    automatically toggle light and dark theme
     25) Proton VPN              virtual private network
-    26) Zotero                  research assistant
+    26) Zotero                  reference manager
 
 INSTALL_LIST
 
@@ -564,17 +565,12 @@ INSTALL_LIST
             # rpm preferred over flatpak as rpm has Wayland support and more secure sandboxing
             dnf repolist --enabled | grep -q 'rpmfusion-free' && sudo dnf install chromium-freeworld
         fi
-        if ! is_installed 'snap' 'pycharm-.*' \
-            && ! is_installed 'flatpak' 'com\.jetbrains\.PyCharm-.*'; then
-            # rpm preferred over flatpak
-            dnf repolist --enabled | grep -q 'phracek-PyCharm' && sudo dnf install pycharm-community
-            # https://docs.fedoraproject.org/en-US/workstation-working-group/third-party-repos/
-        fi
         sudo dnf install qpdf
-        sudo dnf install redhat-display-fonts redhat-mono-fonts redhat-text-fonts
+        sudo dnf install texlive-scheme-basic texmaker
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
+        sudo apt-get --option "$WAIT_APT" install texlive texmaker
         sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 
@@ -591,20 +587,22 @@ INSTALL_LIST
         flatpak install flathub org.gimp.GIMP
         flatpak install flathub com.jetbrains.IntelliJ-IDEA-Community
         flatpak install flathub org.kde.kdenlive
-        is_installed 'pycharm-community' || flatpak install flathub com.jetbrains.PyCharm-Community
+        flatpak install flathub com.jetbrains.PyCharm-Community
         flatpak install flathub org.signal.Signal
         flatpak install flathub com.slack.Slack
         flatpak install flathub org.videolan.VLC
         flatpak install flathub us.zoom.Zoom
     elif [ "$USE_SNAP" = 'True' ]; then
-        is_installed 'chromium-freeworld' || sudo snap install chromium
+        if ! is_installed 'chromium' && ! is_installed 'chromium-freeworld'; then
+            sudo snap install chromium
+        fi
         sudo snap install clion --classic
         sudo snap install discord
         sudo snap install foliate
         sudo snap install gimp
         sudo snap install intellij-idea-community --classic
         sudo snap install kdenlive
-        is_installed 'pycharm-community' || sudo snap install pycharm-community --classic
+        sudo snap install pycharm-community --classic
         sudo snap install signal-desktop
         sudo snap install slack
         sudo snap install vlc

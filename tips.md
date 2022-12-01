@@ -143,7 +143,7 @@ both output and input devices under sound in the settings GUI.
 
 ---
 
-## Recommended web apps
+## Web apps
 
 Chromium supports [progressive web apps](https://en.wikipedia.org/wiki/Progressive_web_app).
 
