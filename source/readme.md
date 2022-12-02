@@ -1,4 +1,4 @@
-# Tips
+# Additional setup tips
 
 Below is a collection of tips and guides that may be useful.
 
@@ -213,9 +213,9 @@ the program from any directory:
 ```sh
 mkdir -p "${HOME}/.local/bin"
 # replace first path with your path to the file
-ln -s "${HOME}/Documents/project/automate/fission.sh" "${HOME}/.local/bin/fission.sh"
-ln -s "${HOME}/Documents/project/automate/linearize.sh" "${HOME}/.local/bin/linearize.sh"
-ln -s "${HOME}/Documents/project/automate/mitosis.sh" "${HOME}/.local/bin/mitosis.sh"
-ln -s "${HOME}/Documents/project/automate/pull.sh" "${HOME}/.local/bin/pull.sh"
-ln -s "${HOME}/Documents/project/automate/replace.sh" "${HOME}/.local/bin/replace.sh"
+ln -s "${HOME}/Documents/project/automate/source/fission.sh" "${HOME}/.local/bin/fission.sh"
+ln -s "${HOME}/Documents/project/automate/source/linearize.sh" "${HOME}/.local/bin/linearize.sh"
+ln -s "${HOME}/Documents/project/automate/source/mitosis.sh" "${HOME}/.local/bin/mitosis.sh"
+ln -s "${HOME}/Documents/project/automate/source/pull.sh" "${HOME}/.local/bin/pull.sh"
+ln -s "${HOME}/Documents/project/automate/source/replace.sh" "${HOME}/.local/bin/replace.sh"
 ```
