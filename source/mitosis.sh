@@ -17,14 +17,14 @@ YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
 
 # return true if the user replies 'yes', false if the user replies 'no'
-prompt_yes() {
+reply_yes() {
     printf '%s (%s / %s) ' "$1" "${GREEN}yes${NORMAL}" "${YELLOW}no${NORMAL}"
     read -r REPLY
     case "$REPLY" in
         yes) return 0 ;;
         no) return 1 ;;
     esac
-    prompt_yes
+    reply_yes
 }
 
 # ------------------------------------------------------------------------------
@@ -73,12 +73,12 @@ read -r name
 archive_path="${ARCHIVE_PREFIX}${name}"
 show_warning "$HOME" "$archive_path"
 
-if prompt_yes 'Back up?'; then
+if reply_yes 'Back up?'; then
     src="$HOME"
     dst="$archive_path"
     [ -d "$dst" ] || exit 1
     archive "${src}/Documents/" "${dst}/Documents"
-elif prompt_yes 'Restore?'; then
+elif reply_yes 'Restore?'; then
     src="$archive_path"
     dst="$HOME"
     [ -d "$src" ] || exit 1

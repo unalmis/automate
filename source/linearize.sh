@@ -14,14 +14,14 @@ YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
 
 # return true if the user replies 'yes', false if the user replies 'no'
-prompt_yes() {
+reply_yes() {
     printf '%s (%s / %s) ' "$1" "${GREEN}yes${NORMAL}" "${YELLOW}no${NORMAL}"
     read -r REPLY
     case "$REPLY" in
         yes) return 0 ;;
         no) return 1 ;;
     esac
-    prompt_yes
+    reply_yes
 }
 
 # ------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ find . -type d -name '.?*' -prune -o \
     -execdir sh -c '! qpdf "$1" --check-linearization --no-warn 2>/dev/null | grep -q "no linearization errors"' _ '{}' ';' \
     -okdir qpdf --linearize --no-warn --replace-input '{}' ';'
 
-if prompt_yes 'Were any warnings printed?'; then
+if reply_yes 'Were any warnings printed?'; then
     cat <<MESSAGE
 
     PDF files can contain junk objects, missing references, etc.
@@ -48,7 +48,7 @@ if prompt_yes 'Were any warnings printed?'; then
 
 MESSAGE
 
-    if prompt_yes 'Ignore warnings and remove originals?'; then
+    if reply_yes 'Ignore warnings and remove originals?'; then
         find . -type f '(' -iname '*.pdf.~qpdf-orig' -o -iname '*.pdf.~qpdf-temp#' ')' -delete
     fi
 fi

@@ -61,14 +61,14 @@ read_silent() {
 }
 
 # return true if the user replies 'yes', false if the user replies 'no'
-prompt_yes() {
+reply_yes() {
     printf '%s (%s / %s) ' "$1" "${GREEN}yes${NORMAL}" "${YELLOW}no${NORMAL}"
     read -r REPLY
     case "$REPLY" in
         yes) return 0 ;;
         no) return 1 ;;
     esac
-    prompt_yes
+    reply_yes
 }
 
 # is the queried app installed?
@@ -95,7 +95,7 @@ set_manager_priority() {
     is_installed 'dnf' && USE_DNF='True'
     is_installed 'apt' && USE_APT='True'
     if [ "$USE_DNF" = 'True' ] && [ "$USE_APT" = 'True' ]; then
-        if prompt_yes 'Detected two package managers. Use dnf instead of apt?'; then
+        if reply_yes 'Detected two package managers. Use dnf instead of apt?'; then
             USE_APT='False'
         else
             USE_DNF='False'
@@ -105,7 +105,7 @@ set_manager_priority() {
     is_installed 'flatpak' && USE_FLAT='True'
     is_installed 'snap' && USE_SNAP='True'
     if [ "$USE_FLAT" = 'True' ] && [ "$USE_SNAP" = 'True' ]; then
-        if prompt_yes 'Detected two package managers. Use flatpak instead of snap?'; then
+        if reply_yes 'Detected two package managers. Use flatpak instead of snap?'; then
             USE_SNAP='False'
         else
             USE_FLAT='False'
@@ -187,19 +187,19 @@ BATTERY
 tweak_git() {
     is_installed 'git' || return 0
 
-    printf '%s\n' 'Default git branch set to main'
     git config --global init.defaultBranch main
-    printf '%s\n' 'Git fetch with prune'
+    printf '%s\n' 'Default git branch set to main'
     git config --global fetch.prune true
-    printf '%s\n' 'Fast forward git pull only'
+    printf '%s\n' 'Git fetch with prune'
     git config --global pull.ff only
-    if prompt_yes 'Sign git commits automatically?'; then
+    printf '%s\n' 'Fast forward git pull only'
+    if reply_yes 'Sign git commits automatically?'; then
         git config --global commit.gpgsign true
         # git config --global user.signingkey KEY
         # You can find your KEY using the below command.
         # gpg --list-secret-keys --keyid-format=long
     fi
-    if prompt_yes 'Set global git commit credentials?'; then
+    if reply_yes 'Set global git commit credentials?'; then
         printf 'Enter your git commit username: '
         read -r git_username
         git config --global user.name "$git_username"
@@ -211,30 +211,41 @@ tweak_git() {
 }
 
 tweak_gnome() {
-    is_installed 'gnome-shell' || return 0
+    is_installed 'gsettings' || return 0
 
-    printf '%s\n' 'Applications menu sorted'
-    gsettings set org.gnome.shell app-picker-layout '[]'
-    printf '%s\n' 'File history retention reduced to 30 days'
+    if is_installed 'gnome-shell'; then
+        gsettings set org.gnome.shell app-picker-layout '[]'
+        printf '%s\n' 'Applications menu sorted'
+    fi
     gsettings set org.gnome.desktop.privacy recent-files-max-age 30
-    printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
+    printf '%s\n' 'File history retention reduced to 30 days'
     gsettings set org.gnome.desktop.privacy remove-old-trash-files true
     gsettings set org.gnome.desktop.privacy remove-old-temp-files true
+    printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
+
+    button_layout=$(gsettings get org.gnome.desktop.wm.preferences button-layout)
+    if [ "$button_layout" = 'appmenu:close' ]; then
+        if reply_yes 'Add buttons to minimize and maximize windows?'; then
+            button_layout='appmenu:minimize,maximize,close'
+            gsettings set org.gnome.desktop.wm.preferences button-layout "$button_layout"
+        # reset to default with: gsettings reset org.gnome.desktop.wm.preferences button-layout
+        fi
+    fi
     printf '\n'
 }
 
 tweak_text_editor() {
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
-        printf '%s\n' 'Text editor set to show line numbers'
         gsettings set org.gnome.TextEditor show-line-numbers true
-        printf '%s\n' 'Text editor right margin position set to 100'
+        printf '%s\n' 'Text editor set to show line numbers'
         gsettings set org.gnome.TextEditor right-margin-position 'uint32 100'
         gsettings set org.gnome.TextEditor show-right-margin true
-        printf '%s\n' 'Text editor tabs set to 4 spaces'
+        printf '%s\n' 'Text editor right margin position set to 100'
         gsettings set org.gnome.TextEditor indent-style 'space'
         gsettings set org.gnome.TextEditor tab-width 'uint32 4'
-        printf '%s\n' 'Text editor will not restore previous session on start'
+        printf '%s\n' 'Text editor tabs set to 4 spaces'
         gsettings set org.gnome.TextEditor restore-session false
+        printf '%s\n' 'Text editor will not restore previous session on start'
         printf '\n'
     fi
     # terminal text editor
@@ -287,12 +298,12 @@ upgrade_system() {
     fi
 
     if [ -f '/var/run/reboot-required' ]; then
-        prompt_yes 'I need to reboot. Reboot?' && reboot
+        reply_yes 'I need to reboot. Reboot?' && reboot
     fi
 
     if is_installed 'fwupdmgr' && [ -f '/sys/class/power_supply/AC/online' ]; then
         read -r is_plugged_in <'/sys/class/power_supply/AC/online'
-        if [ "$is_plugged_in" = '1' ] && prompt_yes 'Upgrade firmware?'; then
+        if [ "$is_plugged_in" = '1' ] && reply_yes 'Upgrade firmware?'; then
             fwupdmgr --force refresh && fwupdmgr update
         fi
     fi
@@ -311,7 +322,7 @@ install_bitwarden() {
         app=$(find "$APPIMAGE_PATH" -type f -iname 'Bitwarden*.AppImage' -print -quit)
         [ -f "$app" ] && return 0 # already installed
     fi
-    prompt_yes 'Install Bitwarden?' || return 0
+    reply_yes 'Install Bitwarden?' || return 0
 
     app='Bitwarden.AppImage'
     url='https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage'
@@ -326,7 +337,7 @@ install_bitwarden() {
 # https://code-industry.net/masterpdfeditor/
 install_master_pdf_editor() {
     if is_installed 'masterpdfeditor5' \
-        || ! prompt_yes 'Install Master PDF editor? (needs license)'; then
+        || ! reply_yes 'Install Master PDF editor? (needs license)'; then
         return 0
     fi
 
@@ -343,7 +354,7 @@ install_master_pdf_editor() {
 
 # https://reference.wolfram.com/language/tutorial/InstallingMathematica.html
 install_mathematica() {
-    if is_installed 'mathematica' || ! prompt_yes 'Install Mathematica? (needs license)'; then
+    if is_installed 'mathematica' || ! reply_yes 'Install Mathematica? (needs license)'; then
         return 0
     fi
 
@@ -360,7 +371,7 @@ install_mathematica() {
 }
 
 install_matlab() {
-    if is_installed 'matlab' || ! prompt_yes 'Install Matlab? (needs license)'; then
+    if is_installed 'matlab' || ! reply_yes 'Install Matlab? (needs license)'; then
         return 0
     fi
 
@@ -397,7 +408,7 @@ MATLAB
 
 # enables playing various videos and audios
 install_media_codecs() {
-    prompt_yes 'Install media codecs?' || return 0
+    reply_yes 'Install media codecs?' || return 0
 
     if [ "$USE_DNF" = 'True' ] && grep -q 'ID=fedora' '/etc/os-release'; then
         # https://rpmfusion.org/Configuration
@@ -410,9 +421,11 @@ install_media_codecs() {
         sudo dnf install "${nonfree}${version}.noarch.rpm"
         sudo dnf group upgrade core # show rpm fusion repositories in software GUI
 
+        sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav \
+            gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
         # https://docs.fedoraproject.org/en-US/quick-docs/
         # assembly_installing-plugins-for-playing-movies-and-music/
-        # Although recommended above, we forgo installing the packages listed below.
+        # Although recommended in the link above, we forgo installing the packages listed below.
         # 1. non-existent 'Multimedia' group
         # 2. 'lame*'
         #    mp3 patents expired in 2016, allowing Fedora to ship with mp3 support
@@ -424,8 +437,6 @@ install_media_codecs() {
         #    use VLC to play media which needs such codecs instead of these bad quality plugins
         # 6. gstreamer1-plugin-openh264
         #    Cisco's H.264 codec has awful performance compared to ffmpeg's
-        sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav \
-            gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
 
         printf '\n%s %s%s%s\n\n' 'For hardware acceleration drivers, see' \
             "$CYAN" 'https://rpmfusion.org/Howto/Multimedia' "$NORMAL"
@@ -441,7 +452,7 @@ install_media_codecs() {
 
 # https://conda.io/projects/conda/en/latest/user-guide/install/linux.html
 install_miniconda() {
-    if is_installed 'conda' || ! prompt_yes 'Install Miniconda?'; then
+    if is_installed 'conda' || ! reply_yes 'Install Miniconda?'; then
         return 0
     fi
 
@@ -468,7 +479,7 @@ install_night_theme_switcher() {
         fi
         return 0
     fi
-    is_installed 'gnome-extensions' && prompt_yes 'Install Night theme switcher?' || return 0
+    is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
     if [ "$gnome_version" -eq 43 ] 2>/dev/null; then
@@ -485,7 +496,7 @@ install_night_theme_switcher() {
 
 # https://protonvpn.com/support/linux-vpn-setup/
 install_proton_vpn() {
-    if is_installed 'protonvpn' || ! prompt_yes 'Install Proton VPN?'; then
+    if is_installed 'protonvpn' || ! reply_yes 'Install Proton VPN?'; then
         return 0
     fi
 

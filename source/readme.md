@@ -188,23 +188,6 @@ find . -type f -execdir chmod -x '{}' '+'
 
 ---
 
-## Customize Gnome
-
-Add buttons to minimize and maximize windows:
-
-```sh
-# default key is 'appmenu:close'
-gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
-```
-
-Reset window button layout:
-
-```sh
-gsettings reset org.gnome.desktop.wm.preferences button-layout
-```
-
----
-
 ## Terminal shortcuts
 
 Create soft links of my programs in the user's local bin, which allows running
