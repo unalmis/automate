@@ -160,6 +160,7 @@ lacks ads.
 - [Instagram](https://www.instagram.com/)
 - [LinkedIn](https://www.linkedin.com/)
 - [Outlook](https://outlook.office.com/mail/)
+- [Proton Mail](https://mail.proton.me/u/0/inbox)
 - [Snapchat](https://web.snapchat.com/)
 - [Spotify](https://open.spotify.com/)
 - [WhatsApp](https://web.whatsapp.com/)
