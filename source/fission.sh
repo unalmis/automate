@@ -125,7 +125,7 @@ enable_firewall() {
         fi
     elif is_installed 'ufw'; then
         printf '%s\n' 'Checking if firewall is active...'
-        if sudo ufw status | grep -q --word-regexp 'inactive'; then
+        if sudo ufw status | grep -q --word-regexp -- 'inactive'; then
             printf '%s\n' 'Enabling the firewall...'
             sudo ufw enable
         fi
@@ -193,13 +193,15 @@ tweak_git() {
     printf '%s\n' 'Git fetch with prune'
     git config --global pull.ff only
     printf '%s\n' 'Fast forward git pull only'
-    if reply_yes 'Sign git commits automatically?'; then
-        git config --global commit.gpgsign true
-        # git config --global user.signingkey KEY
-        # You can find your KEY using the below command.
-        # gpg --list-secret-keys --keyid-format=long
+    if ! grep -q -- 'gpgsign = true' "${HOME}/.gitconfig"; then
+        if reply_yes 'Sign git commits automatically?'; then
+            git config --global commit.gpgsign true
+            # git config --global user.signingkey KEY
+            # You can find your KEY using the below command.
+            # gpg --list-secret-keys --keyid-format=long
+        fi
     fi
-    if reply_yes 'Set global git commit credentials?'; then
+    if reply_yes 'Enter global git commit credentials?'; then
         printf 'Enter your git commit username: '
         read -r git_username
         git config --global user.name "$git_username"
@@ -402,14 +404,16 @@ MATLAB
         [ -f "$app_zip" ] && unzip -q "$app_zip" -d "$app_tmp"
         rm --force -- "$app_zip"
     fi
-    [ -d "$app_tmp" ] && sh "${app_tmp}/install" && rm --recursive --force -- "$app_tmp"
+    if [ -d "$app_tmp" ]; then
+        sh "${app_tmp}/install" && rm --recursive --force -- "$app_tmp"
+    fi
 }
 
 # enables playing various videos and audios
 install_media_codecs() {
     reply_yes 'Install media codecs?' || return 0
 
-    if [ "$USE_DNF" = 'True' ] && grep -q 'ID=fedora' '/etc/os-release'; then
+    if [ "$USE_DNF" = 'True' ] && grep -q -- 'ID=fedora' '/etc/os-release'; then
         # https://rpmfusion.org/Configuration
         # rpm fusion free    needed for ffmpeg-libs, which has the H.264 codec
         # rpm fusion nonfree needed for drivers and hardware acceleration
@@ -440,7 +444,7 @@ install_media_codecs() {
         printf '\n%s %s%s%s\n\n' 'For hardware acceleration drivers, see' \
             "$CYAN" 'https://rpmfusion.org/Howto/Multimedia' "$NORMAL"
 
-    elif [ "$USE_APT" = 'True' ] && grep -q 'ID=ubuntu' '/etc/os-release'; then
+    elif [ "$USE_APT" = 'True' ] && grep -q -- 'ID=ubuntu' '/etc/os-release'; then
         # https://help.ubuntu.com/community/RestrictedFormats
         # I recommend ubuntu-restricted-extras even on ubuntu derivatives.
         # The [k,l,x]ubuntu-restricted-extras packages are not well maintained.
@@ -467,11 +471,11 @@ install_miniconda() {
 install_night_theme_switcher() {
     # https://gitlab.com/rmnvgr/nightthemeswitcher-gnome-shell-extension
     # #something-doesnt-work-on-ubuntu
-    grep -q 'ID=ubuntu' '/etc/os-release' && return 0 # Ubuntu is not supported.
+    grep -q -- 'ID=ubuntu' '/etc/os-release' && return 0 # Ubuntu is not supported.
 
     app_uuid='nightthemeswitcher@romainvigier.fr'
     if is_installed 'gnome extension' "$app_uuid"; then
-        if gnome-extensions info "$app_uuid" | grep -q --ignore-case 'state: initialized'; then
+        if gnome-extensions info "$app_uuid" | grep -q --ignore-case -- 'state: initialized'; then
             # need to enable extensions on the next login session after installation
             # initialized state implies the extension was never enabled (or disabled)
             gnome-extensions enable "$app_uuid"
@@ -573,7 +577,11 @@ INSTALL_LIST
     if [ "$USE_DNF" = 'True' ]; then
         if ! is_installed 'chromium' && ! is_installed 'snap' 'chromium'; then
             # rpm preferred over flatpak as rpm has Wayland support and more secure sandboxing
-            dnf repolist --enabled | grep -q 'rpmfusion-free' && sudo dnf install chromium-freeworld
+            if dnf repolist --enabled | grep -q -- 'rpmfusion-free'; then
+                sudo dnf install chromium-freeworld
+            else
+                sudo dnf install chromium
+            fi
         fi
         sudo dnf install qpdf
         sudo dnf install texlive-scheme-basic texmaker

@@ -143,30 +143,6 @@ both output and input devices under sound in the settings GUI.
 
 ---
 
-## Web apps
-
-Chromium supports [progressive web apps](https://en.wikipedia.org/wiki/Progressive_web_app).
-
-If a website has a PWA, a prompt to install it will show in the url bar.
-Otherwise, you can make a web app with `Customize and control Chromium` ->
-`More tools` -> `Create shortcut`.
-
-An advantage of web apps is that they remain sandboxed. Extensions like uBlock
-Origin will also work in them. For the Spotify web app, this means playback
-lacks ads.
-
-- [Gmail](https://mail.google.com/mail/u/0/#inbox)
-- [GroupMe](https://web.groupme.com/)
-- [Instagram](https://www.instagram.com/)
-- [LinkedIn](https://www.linkedin.com/)
-- [Outlook](https://outlook.office.com/mail/)
-- [Proton Mail](https://mail.proton.me/u/0/inbox)
-- [Snapchat](https://web.snapchat.com/)
-- [Spotify](https://open.spotify.com/)
-- [WhatsApp](https://web.whatsapp.com/)
-
----
-
 ## File security
 
 Some versions of Windows OS set the executable bit on files by default.
