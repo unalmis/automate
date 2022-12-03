@@ -342,8 +342,7 @@ install_master_pdf_editor() {
     fi
 
     url='https://code-industry.net/public/'
-    app="master-pdf-editor-5.8.52-qt5.$(arch)" # last version for my license
-    # The app prompts for upgrades, so installing this version should not inconvenience others.
+    app="master-pdf-editor-5.9.10-qt5.$(arch)"
     if [ "$USE_DNF" = 'True' ]; then
         sudo dnf -q -y install "${url}${app}.rpm"
     elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
