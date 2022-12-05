@@ -56,15 +56,9 @@ archive() {
     # deletes files in the 2nd directory if they don't exist in the 1st
     # remove '--delete-excluded' to avoid this
     # note that --include='.git' should always be paired with --delete
-    rsync --archive \
-        --no-D \
-        --prune-empty-dirs \
-        --delete-excluded \
-        --include='.git' \
-        --exclude='.*' \
-        --info=progress2 \
-        --human-readable \
-        "$1" "$2"
+    rsync --archive --no-D --prune-empty-dirs \
+        --delete-excluded --include='.git' --exclude='.*' \
+        --info=progress2 --human-readable -- "$1" "$2"
 }
 
 clear

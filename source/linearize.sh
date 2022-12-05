@@ -32,7 +32,7 @@ reply_yes() {
 # If it is not, prompt the user to linearize it.
 find . -type d -name '.?*' -prune -o \
     -type f -iname '*.pdf' \
-    -execdir sh -c '! qpdf "$1" --check-linearization --no-warn 2>/dev/null | grep -q "no linearization errors"' _ '{}' ';' \
+    -execdir sh -c '! qpdf "$1" --check-linearization --no-warn 2>/dev/null | grep -q -- "no linearization errors"' _ '{}' ';' \
     -okdir qpdf --linearize --no-warn --replace-input '{}' ';'
 
 if reply_yes 'Were any warnings printed?'; then
