@@ -313,7 +313,7 @@ upgrade_system() {
 
 # ------------------------------------------------------------------------------
 
-# https://bitwarden.com/
+# https://bitwarden.com/download/
 install_bitwarden() {
     if [ "$USE_SNAP" = 'True' ]; then
         sudo snap install bitwarden
@@ -336,10 +336,9 @@ install_bitwarden() {
     fi
 }
 
-# https://code-industry.net/masterpdfeditor/
+# https://code-industry.net/free-pdf-editor/
 install_master_pdf_editor() {
-    if is_installed 'masterpdfeditor5' \
-        || ! reply_yes 'Install Master PDF editor? (needs license)'; then
+    if is_installed 'masterpdfeditor5' || ! reply_yes 'Install Master PDF editor?'; then
         return 0
     fi
 
@@ -486,7 +485,7 @@ install_night_theme_switcher() {
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
     if [ "$gnome_version" -eq 43 ] 2>/dev/null; then
-        app_version='71'
+        app_version='72'
     elif [ "$gnome_version" -eq 42 ] 2>/dev/null; then
         app_version='65'
     else
@@ -546,7 +545,7 @@ install_apps() {
      1) media codecs            enables playing various videos (recommended)
      2) Chromium                web browser
      3) qPDF                    CLI tool for PDF files
-     4) Texmaker                Latex editor
+     4) Texmaker                LaTeX editor
      5) uBlock Origin           ad content blocker (recommended)
      6) CLion                   C and C++ IDE
      7) Discord                 messaging (proprietary)
