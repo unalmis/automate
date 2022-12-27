@@ -226,7 +226,7 @@ tweak_gnome() {
     printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
 
     button_layout=$(gsettings get org.gnome.desktop.wm.preferences button-layout)
-    if [ "$button_layout" = 'appmenu:close' ]; then
+    if [ "$button_layout" = "'appmenu:close'" ]; then
         if reply_yes 'Add buttons to minimize and maximize windows?'; then
             button_layout='appmenu:minimize,maximize,close'
             gsettings set org.gnome.desktop.wm.preferences button-layout "$button_layout"
