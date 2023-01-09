@@ -168,7 +168,6 @@ find . -type f -execdir chmod -x '{}' '+'
 
 The expected output of `gnome-boxes --checks` is:
 ```sh
-gnome-boxes --checks
 The CPU is capable of virtualization: yes
 The KVM module is loaded: yes
 Libvirt KVM guest available: yes
@@ -181,7 +180,6 @@ See [dependency bug](https://bugzilla.redhat.com/show_bug.cgi?id=1868818).
 
 The actual output is:
 ```sh
-gnome-boxes --checks
 The CPU is capable of virtualization: yes
 The KVM module is loaded: yes
 Libvirt KVM guest available: no
