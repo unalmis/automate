@@ -164,6 +164,38 @@ find . -type f -execdir chmod -x '{}' '+'
 
 ---
 
+## Gnome Boxes virtualization
+
+The expected output of `gnome-boxes --checks` is:
+```sh
+gnome-boxes --checks
+The CPU is capable of virtualization: yes
+The KVM module is loaded: yes
+Libvirt KVM guest available: yes
+Boxes storage pool available: yes
+The SELinux context is default: yes
+```
+
+However, the necessary dependencies are not installed on Fedora.
+See [dependency bug](https://bugzilla.redhat.com/show_bug.cgi?id=1868818).
+
+The actual output is:
+```sh
+gnome-boxes --checks
+The CPU is capable of virtualization: yes
+The KVM module is loaded: yes
+Libvirt KVM guest available: no
+Boxes storage pool available: no
+The SELinux context is default: yes
+```
+
+Install the missing dependencies to resolve the issue.
+```sh
+sudo dnf install libvirt-client virtdetect
+```
+
+---
+
 ## Terminal shortcuts
 
 Create soft links of my programs in the user's local bin, which allows running
