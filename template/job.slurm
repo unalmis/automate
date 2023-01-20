@@ -12,5 +12,5 @@
 
 # write commands to run your program below
 module purge
-module load anaconda3/2021.11
+module load anaconda3/2022.5
 conda activate ENVNAME

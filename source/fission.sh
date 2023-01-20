@@ -343,7 +343,7 @@ install_master_pdf_editor() {
     fi
 
     url='https://code-industry.net/public/'
-    app="master-pdf-editor-5.9.20-qt5.$(arch)"
+    app="master-pdf-editor-5.9.30-qt5.$(arch)"
     if [ "$USE_DNF" = 'True' ]; then
         sudo dnf -q -y install "${url}${app}.rpm"
     elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
