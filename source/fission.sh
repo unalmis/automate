@@ -239,10 +239,9 @@ tweak_gnome() {
 tweak_text_editor() {
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
         gsettings set org.gnome.TextEditor show-line-numbers true
-        printf '%s\n' 'Text editor set to show line numbers'
-        gsettings set org.gnome.TextEditor right-margin-position 'uint32 100'
+        printf '%s\n' 'Text editor shows line numbers'
         gsettings set org.gnome.TextEditor show-right-margin true
-        printf '%s\n' 'Text editor right margin position set to 100'
+        printf '%s\n' 'Text editor shows right margin position'
         gsettings set org.gnome.TextEditor indent-style 'space'
         gsettings set org.gnome.TextEditor tab-width 'uint32 4'
         printf '%s\n' 'Text editor tabs set to 4 spaces'
@@ -583,7 +582,7 @@ INSTALL_LIST
             fi
         fi
         sudo dnf install qpdf
-        sudo dnf install texlive-scheme-basic texmaker
+        sudo dnf install texlive-scheme-medium texmaker
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
