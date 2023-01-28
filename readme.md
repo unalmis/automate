@@ -59,10 +59,10 @@ The simplest backup program you'll ever need.
 
 ### pull.sh
 
-Updates all local repositories in the current directory, recursively.
+Updates local repositories in the current directory, recursively.
 
 ---
 
 ### replace.sh
 
-Replaces strings within files in the current directory, recursively.
+Replaces strings in files in the current directory, recursively.

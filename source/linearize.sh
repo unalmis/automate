@@ -1,10 +1,10 @@
 #!/bin/sh
 # ------------------------------------------------------------------------------
-# @author      Kaya Unalmis
-# @license     GNU GPLv3
-# @date        2022 October 23
-# @command     sh linearize.sh
-# @description Linearize PDF files in the current directory, recursively
+# @author       Kaya Unalmis
+# @license      GNU GPLv3
+# @date         2022 October 23
+# @command      sh linearize.sh
+# @description  Linearize PDF files in the current directory, recursively
 # ------------------------------------------------------------------------------
 
 # output text settings

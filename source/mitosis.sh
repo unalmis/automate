@@ -1,10 +1,10 @@
 #!/bin/sh
 # ------------------------------------------------------------------------------
-# @author      Kaya Unalmis
-# @license     GNU GPLv3
-# @date        2022 October 23
-# @command     sh mitosis.sh
-# @description Back up (restore) files to (from) your archive
+# @author       Kaya Unalmis
+# @license      GNU GPLv3
+# @date         2022 October 23
+# @command      sh mitosis.sh
+# @description  Back up (restore) files to (from) your archive
 # ------------------------------------------------------------------------------
 
 # TODO: Some systems mount drives under '/media' instead of '/run/media'.

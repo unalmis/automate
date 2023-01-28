@@ -1,11 +1,11 @@
 #!/bin/sh
 # ------------------------------------------------------------------------------
-# @author      Kaya Unalmis
-# @license     GNU GPLv3
-# @date        2022 October 23
-# @command     sh fission.sh
-# @description Set up and maintain RPM or Debian based systems
-#              (tested on Fedora and Ubuntu)
+# @author       Kaya Unalmis
+# @license      GNU GPLv3
+# @date         2022 October 23
+# @command      sh fission.sh
+# @description  Set up and maintain RPM or Debian based systems
+#               (tested on Fedora and Ubuntu)
 # ------------------------------------------------------------------------------
 
 # This code mostly avoids operating system specific routines.
@@ -544,7 +544,7 @@ install_apps() {
      1) media codecs            enables playing various videos (recommended)
      2) Chromium                web browser
      3) qPDF                    CLI tool for PDF files
-     4) Texmaker                LaTeX editor
+     4) LaTeX                   typesetting for scientific documents
      5) uBlock Origin           ad content blocker (recommended)
      6) CLion                   C and C++ IDE
      7) Discord                 messaging (proprietary)
@@ -582,11 +582,11 @@ INSTALL_LIST
             fi
         fi
         sudo dnf install qpdf
-        sudo dnf install texlive-scheme-medium texmaker
+        sudo dnf install texlive-scheme-medium texlive-minted texlive-subfiles
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
-        sudo apt-get --option "$WAIT_APT" install texlive texmaker
+        sudo apt-get --option "$WAIT_APT" install texlive
         sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 

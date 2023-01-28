@@ -1,10 +1,10 @@
 #!/bin/sh
 # ------------------------------------------------------------------------------
-# @author      Kaya Unalmis
-# @license     GNU GPLv3
-# @date        2022 October 23
-# @command     sh pull.sh
-# @description Update all local repositories in the current directory, recursively
+# @author       Kaya Unalmis
+# @license      GNU GPLv3
+# @date         2022 October 23
+# @command      sh pull.sh
+# @description  Update local repositories in the current directory, recursively
 # ------------------------------------------------------------------------------
 
 # Find hidden directories (those leading with '.') inside the current directory.
