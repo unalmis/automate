@@ -582,7 +582,8 @@ INSTALL_LIST
             fi
         fi
         sudo dnf install qpdf
-        sudo dnf install texlive-scheme-medium texlive-minted texlive-subfiles
+        sudo dnf install texlive-scheme-medium \
+            texlive-minted texlive-moderncv texlive-subfiles
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
