@@ -48,6 +48,11 @@ show_warning() {
             source:      ${CYAN}${2}/example${NORMAL}
             destination: ${CYAN}${1}/example${NORMAL}
 
+    After selecting an option, you will be asked whether to perform a dry run.
+    Dry runs do not make any changes.
+    Dry runs only print to the terminal what would have happened.
+    Please do a dry run if you have not used this program before.
+
 MESSAGE
 }
 
@@ -56,9 +61,16 @@ archive() {
     # deletes files in the 2nd directory if they don't exist in the 1st
     # remove '--delete-excluded' to avoid this
     # note that --include='.git' should always be paired with --delete
-    rsync --archive --no-D --prune-empty-dirs \
-        --delete-excluded --include='.git' --exclude='.*' \
-        --info=progress2 --human-readable -- "$1" "$2"
+    if reply_yes 'Dry run?'; then
+        rsync --dry-run --verbose --itemize-changes \
+            --archive --no-D --prune-empty-dirs \
+            --delete-excluded --include='.git' --exclude='.*' \
+            --human-readable -- "$1" "$2"
+    else
+        rsync --archive --no-D --prune-empty-dirs \
+            --delete-excluded --include='.git' --exclude='.*' \
+            --info=progress2 --human-readable -- "$1" "$2"
+    fi
 }
 
 clear
