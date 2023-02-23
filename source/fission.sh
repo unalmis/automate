@@ -240,8 +240,6 @@ tweak_text_editor() {
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
         gsettings set org.gnome.TextEditor show-line-numbers true
         printf '%s\n' 'Text editor shows line numbers'
-        gsettings set org.gnome.TextEditor show-right-margin true
-        printf '%s\n' 'Text editor shows right margin position'
         gsettings set org.gnome.TextEditor indent-style 'space'
         gsettings set org.gnome.TextEditor tab-width 'uint32 4'
         printf '%s\n' 'Text editor tabs set to 4 spaces'
