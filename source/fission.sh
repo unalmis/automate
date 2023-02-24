@@ -543,28 +543,29 @@ install_apps() {
      2) Chromium                web browser
      3) qPDF                    CLI tool for PDF files
      4) LaTeX                   typesetting for scientific documents
-     5) uBlock Origin           ad content blocker (recommended)
-     6) CLion                   C and C++ IDE
-     7) Discord                 messaging (proprietary)
-     8) Extensions              manage Gnome extensions
-     9) Flatseal                manage flatpak permissions
-    10) Foliate                 ebook viewer
-    11) Gimp                    image editor
-    12) IntelliJ                Java IDE
-    13) Kdenlive                video editor
-    14) PyCharm                 Python IDE
-    15) Signal                  messaging (open source, encrypted)
-    16) Slack                   messaging (proprietary)
-    17) VLC                     reliable media player
-    18) Zoom                    video conferencing
-    19) Bitwarden               password manager
-    20) Master PDF editor       portable document format file editor
-    21) Matlab                  scientific computing software
-    22) Mathematica             scientific computing software
-    23) Miniconda               programming environment and package manager
-    24) Night theme switcher    automatically toggle light and dark theme
-    25) Proton VPN              virtual private network
-    26) Zotero                  reference manager
+     5) Setzer                  LaTeX editor
+     6) uBlock Origin           ad content blocker (recommended)
+     7) CLion                   C and C++ IDE
+     8) Discord                 messaging (proprietary)
+     9) Extensions              manage Gnome extensions
+    10) Flatseal                manage flatpak permissions
+    11) Foliate                 ebook viewer
+    12) Gimp                    image editor
+    13) IntelliJ                Java IDE
+    14) Kdenlive                video editor
+    15) PyCharm                 Python IDE
+    16) Signal                  messaging (open source, encrypted)
+    17) Slack                   messaging (proprietary)
+    18) VLC                     reliable media player
+    19) Zoom                    video conferencing
+    20) Bitwarden               password manager
+    21) Master PDF editor       portable document format file editor
+    22) Matlab                  scientific computing software
+    23) Mathematica             scientific computing software
+    24) Miniconda               programming environment and package manager
+    25) Night theme switcher    automatically toggle light and dark theme
+    26) Proton VPN              virtual private network
+    27) Zotero                  reference manager
 
 INSTALL_LIST
 
@@ -580,12 +581,13 @@ INSTALL_LIST
             fi
         fi
         sudo dnf install qpdf
-        sudo dnf install texlive-scheme-medium \
-            texlive-minted texlive-moderncv texlive-subfiles
+        sudo dnf install texlive-scheme-medium texlive-minted texlive-moderncv texlive-subfiles
+        sudo dnf install setzer
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
         sudo apt-get --option "$WAIT_APT" install texlive
+        sudo apt-get --option "$WAIT_APT" install setzer
         sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 
