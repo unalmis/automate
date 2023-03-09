@@ -349,24 +349,6 @@ install_master_pdf_editor() {
     fi
 }
 
-# https://reference.wolfram.com/language/tutorial/InstallingMathematica.html
-install_mathematica() {
-    if is_installed 'mathematica' || ! reply_yes 'Install Mathematica? (needs license)'; then
-        return 0
-    fi
-
-    url='https://account.wolfram.com/download/mathematica/desktop/LINUX?type=full'
-    xdg-open "$url" 1>/dev/null 2>/dev/null
-    printf 'When the download finishes, press enter to continue. '
-    read_silent
-
-    app=$(find "${HOME}/Downloads" -type f -name 'Mathematica_*_LINUX.sh' -print -quit)
-    [ -f "$app" ] || return 1
-    if bash "$app" -- -auto -execdir="$USER_BIN" -selinux='n' -targetdir="${HOME}/mathematica"; then
-        rm --force -- "$app"
-    fi
-}
-
 install_matlab() {
     if is_installed 'matlab' || ! reply_yes 'Install Matlab? (needs license)'; then
         return 0
@@ -375,18 +357,15 @@ install_matlab() {
     cat <<MATLAB
 
     The matlab GUI installer will ask some questions.
-    For it to work properly, you should answer:
-    1. Install matlab in ${CYAN}${HOME}/matlab${NORMAL}
-    2. Put links in ${CYAN}${USER_BIN}${NORMAL}
-    3. Set user name to ${CYAN}${USER}${NORMAL}
-
+    You should answer:
+    1. Set login name to ${CYAN}${USER}${NORMAL}
+    2. Set installation destination to ${CYAN}${HOME}/matlab${NORMAL}
+    2. Create links in ${CYAN}${USER_BIN}${NORMAL}
     Once installed, you can enter ${CYAN}matlab${NORMAL} in terminal to start it.
+    A desktop file should be created automatically on the next login.
 
-    If installation fails, try again after temporarily switching to a Xorg session.
-    https://docs.fedoraproject.org/en-US/quick-docs/configuring-xorg-as-default-gnome-session/
-
-    You can also use matlab from a web browser.
-    https://matlab.mathworks.com
+    If installation fails, see https://wiki.archlinux.org/title/MATLAB.
+    Otherwise, you can use matlab on the web at https://matlab.mathworks.com.
 
 MATLAB
 
@@ -401,7 +380,23 @@ MATLAB
         rm --force -- "$app_zip"
     fi
     if [ -d "$app_tmp" ]; then
-        sh "${app_tmp}/install" && rm --recursive --force -- "$app_tmp"
+        # remove incompatible library, then install
+        # https://wiki.archlinux.org/title/MATLAB#Unable_to_launch_the_MATLABWindow_application
+        rm --force -- "${app_tmp}/bin/glnxa64/libfreetype.so"*
+        sh "${app_tmp}/install"
+    fi
+    # add desktop entry
+    if is_installed 'matlab'; then
+        tee "${HOME}/.local/share/applications/matlab.desktop" 1>/dev/null <<DESKTOP
+[Desktop Entry]
+Type=Application
+Terminal=false
+MimeType=text/x-matlab
+Exec=${HOME}/matlab/bin/matlab -desktop
+Name=Matlab
+Comment=scientific computing software
+StartupNotify=true
+DESKTOP
     fi
 }
 
@@ -517,6 +512,24 @@ install_proton_vpn() {
     fi
 }
 
+# https://reference.wolfram.com/language/tutorial/InstallingMathematica.html
+install_wolfram_alpha() {
+    if is_installed 'wolframalphanb' || ! reply_yes 'Install Wolfram Alpha? (needs license)'; then
+        return 0
+    fi
+
+    url='https://account.wolfram.com/dl/WolframAlphaNotebookEdition?platform=Linux'
+    xdg-open "$url" 1>/dev/null 2>/dev/null
+    printf 'When the download finishes, press enter to continue. '
+    read_silent
+
+    app=$(find "${HOME}/Downloads" -type f -name 'WolframAlphaNotebook_*_LINUX.sh' -print -quit)
+    [ -f "$app" ] || return 1
+    if bash "$app" -- -auto -execdir="$USER_BIN" -selinux='n' -targetdir="${HOME}/wolfram/wolfram_alpha"; then
+        rm --force -- "$app"
+    fi
+}
+
 # https://www.zotero.org/
 install_zotero() {
     oxt_name='Zotero_OpenOffice_Integration.oxt'
@@ -562,11 +575,11 @@ install_apps() {
     19) Zoom                    video conferencing
     20) Bitwarden               password manager
     21) Master PDF editor       portable document format file editor
-    22) Matlab                  scientific computing software
-    23) Mathematica             scientific computing software
-    24) Miniconda               programming environment and package manager
-    25) Night theme switcher    automatically toggle light and dark theme
-    26) Proton VPN              virtual private network
+    22) Matlab                  scientific computing software (not recommended)
+    23) Miniconda               programming environment and package manager
+    24) Night theme switcher    automatically toggle light and dark theme
+    25) Proton VPN              virtual private network
+    26) Wolfram Alpha           scientific computing software
     27) Zotero                  reference manager
 
 INSTALL_LIST
@@ -631,10 +644,10 @@ INSTALL_LIST
     install_bitwarden
     install_master_pdf_editor
     install_matlab
-    install_mathematica
     install_miniconda
     install_night_theme_switcher
     install_proton_vpn
+    install_wolfram_alpha
     install_zotero
 }
 
