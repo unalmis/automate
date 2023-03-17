@@ -154,29 +154,26 @@ set_battery_charge_thresholds() {
     adapter, as it prevents unnecessary micro-charging that would reduce
     battery longevity.
 
-                      start:end
-    1) ${YELLOW}full charge${NORMAL}       96:99
-    2) ${CYAN}balanced${NORMAL}          85:90
-    3) ${GREEN}max lifespan${NORMAL}      40:50
+                           start:end
+    0) Do not change anything.
+    1) ${GREEN}full charge${NORMAL}            96:100
+    2) ${CYAN}balanced${NORMAL}               75:100
 
 BATTERY
 
-    # threshold values from https://support.lenovo.com/us/en/solutions/
-    # ht078208-how-can-i-increase-battery-life-thinkpad-and-lenovo-vbke-series-notebooks
+    # Newer models do not like it when hi is below 100.
+    # https://linrunner.de/tlp/faq/battery.html#erratic-battery-behavior-on-thinkpad-t420-s-t520-w520-x220-and-all-later-models
+    # https://linrunner.de/tlp/faq/battery.html#faq-good-battery-thresholds
     printf 'Select an option: '
     read -r REPLY
-    lo='96'
-    hi='99'
-    case "$REPLY" in
-        2)
-            lo='85'
-            hi='90'
-            ;;
-        3)
-            lo='40'
-            hi='50'
-            ;;
-    esac
+    hi='100'
+    if [ "$REPLY" = '1' ]; then
+        lo='96'
+    elif [ "$REPLY" = '2' ]; then
+        lo='75'
+    else
+        return 0
+    fi
     # write values to protected files
     # silence stderr as tee incorrectly complains file is invalid
     sudo --remove-timestamp
