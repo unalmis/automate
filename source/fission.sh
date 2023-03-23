@@ -156,8 +156,9 @@ set_battery_charge_thresholds() {
 
                            start:end
     0) Do not change anything.
-    1) ${GREEN}full charge${NORMAL}            96:100
+    1) ${YELLOW}full charge${NORMAL}            96:100
     2) ${CYAN}balanced${NORMAL}               75:100
+    3) ${GREEN}more lifespan${NORMAL}          50:100
 
 BATTERY
 
@@ -171,6 +172,8 @@ BATTERY
         lo='96'
     elif [ "$REPLY" = '2' ]; then
         lo='75'
+    elif [ "$REPLY" = '3' ]; then
+        lo='50'
     else
         return 0
     fi
