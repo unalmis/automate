@@ -240,6 +240,8 @@ tweak_text_editor() {
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
         gsettings set org.gnome.TextEditor show-line-numbers true
         printf '%s\n' 'Text editor shows line numbers'
+        gsettings set org.gnome.TextEditor highlight-current-line true
+        printf '%s\n' 'Text editor highlights current line'
         gsettings set org.gnome.TextEditor indent-style 'space'
         gsettings set org.gnome.TextEditor tab-width 'uint32 4'
         printf '%s\n' 'Text editor tabs set to 4 spaces'
@@ -339,13 +341,29 @@ install_master_pdf_editor() {
         return 0
     fi
 
-    url='https://code-industry.net/public/'
-    app="master-pdf-editor-5.9.40-qt5.$(arch)"
+    # code used to install before remote repository was available
+    # url='https://code-industry.net/public/'
+    # app="master-pdf-editor-5.9.50-1-qt5.$(arch)"
+    # if [ "$USE_DNF" = 'True' ]; then
+    #     sudo dnf -q -y install "${url}${app}.rpm"
+    # elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
+    #     sudo apt-get -qq --option "$WAIT_APT" install "./${app}.deb"
+    #     rm --force -- "${app}.deb"
+    # fi
+
+    # can now install from remote repository
+    # https://code-industry.net/package-installation-from-remote-repository/
+    url='http://repo.code-industry.net/'
     if [ "$USE_DNF" = 'True' ]; then
-        sudo dnf -q -y install "${url}${app}.rpm"
-    elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
-        sudo apt-get -qq --option "$WAIT_APT" install "./${app}.deb"
-        rm --force -- "${app}.deb"
+        sudo dnf config-manager --add-repo "${url}rpm/master-pdf-editor.repo"
+        sudo dnf -q -y --refresh install master-pdf-editor
+    elif [ "$USE_APT" = 'True' ]; then
+        key_path='/etc/apt/keyrings/pubmpekey.asc'
+        wget -q --output-document - "${url}deb/pubmpekey.asc" | sudo tee "$key_path"
+        printf "deb [signed-by=${key_path} arch=$(dpkg --print-architecture)] ${url}deb stable main" \
+            | sudo tee '/etc/apt/sources.list.d/master-pdf-editor.list'
+        sudo apt-get -qq --option "$WAIT_APT" update \
+            && sudo apt-get -qq install master-pdf-editor-5
     fi
 }
 
@@ -383,7 +401,7 @@ MATLAB
         # remove incompatible library, then install
         # https://wiki.archlinux.org/title/MATLAB#Unable_to_launch_the_MATLABWindow_application
         rm --force -- "${app_tmp}/bin/glnxa64/libfreetype.so"*
-        sh "${app_tmp}/install"
+        bash "${app_tmp}/install"
     fi
     # add desktop entry
     if is_installed 'matlab'; then
@@ -415,22 +433,18 @@ install_media_codecs() {
         sudo dnf install "${nonfree}${version}.noarch.rpm"
         sudo dnf group upgrade core # show rpm fusion repositories in software GUI
 
+        # https://rpmfusion.org/Howto/Multimedia
+        sudo dnf -y swap ffmpeg-free ffmpeg --allowerasing
         sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav \
             gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
-        # https://docs.fedoraproject.org/en-US/quick-docs/
-        # assembly_installing-plugins-for-playing-movies-and-music/
+        # https://docs.fedoraproject.org/en-US/quick-docs/assembly_installing-plugins-for-playing-movies-and-music/
         # Although recommended in the link above, we forgo installing the packages listed below.
-        # 1. non-existent 'Multimedia' group
-        # 2. 'lame*'
-        #    mp3 patents expired in 2016, allowing Fedora to ship with mp3 support
-        # 3. gstreamer1-libav
-        #    replaced with 'gstreamer1-plugin-libav' in fedora 37+ repo
-        # 4. 'gstreamer1-plugins-ugly-*'
-        #    use VLC media player instead to avoid licensing issues
-        # 5. 'gstreamer1-plugins-bad-*'
-        #    use VLC to play media which needs such codecs instead of these bad quality plugins
-        # 6. gstreamer1-plugin-openh264
-        #    Cisco's H.264 codec has awful performance compared to ffmpeg's
+        # 1. 'Multimedia' group no longer exists.
+        # 2. 'lame*' mp3 patents expired in 2016, allowing Fedora to ship with mp3 support
+        # 3. 'gstreamer1-libav' replaced with 'gstreamer1-plugin-libav' in fedora 37+ repo
+        # 4. 'gstreamer1-plugins-ugly-*' use VLC media player instead to avoid licensing issues
+        # 5. 'gstreamer1-plugins-bad-*' use VLC to play media which needs such codecs instead of these bad quality plugins
+        # 6. 'gstreamer1-plugin-openh264' Cisco's H.264 codec has awful performance compared to ffmpeg's
 
         printf '\n%s %s%s%s\n\n' 'For hardware acceleration drivers, see' \
             "$CYAN" 'https://rpmfusion.org/Howto/Multimedia' "$NORMAL"
@@ -476,12 +490,12 @@ install_night_theme_switcher() {
     is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
-    if [ "$gnome_version" -eq 44 ] 2>/dev/null; then
+    if [ "$gnome_version" -eq 45 ] 2>/dev/null; then
+        app_version='75'
+    elif [ "$gnome_version" -eq 44 ] 2>/dev/null; then
         app_version='74'
     elif [ "$gnome_version" -eq 43 ] 2>/dev/null; then
         app_version='73'
-    elif [ "$gnome_version" -eq 42 ] 2>/dev/null; then
-        app_version='65'
     else
         return 1
     fi
@@ -492,40 +506,40 @@ install_night_theme_switcher() {
 
 # https://protonvpn.com/support/linux-vpn-setup/
 install_proton_vpn() {
-    if is_installed 'protonvpn' || ! reply_yes 'Install Proton VPN?'; then
+    if is_installed 'protonvpn-app' || ! reply_yes 'Install Proton VPN?'; then
         return 0
     fi
 
     if [ "$USE_DNF" = 'True' ]; then
-        url='https://repo.protonvpn.com/fedora-36-stable/release-packages/'
-        app='protonvpn-stable-release-1.0.1-1.noarch.rpm'
-        sudo dnf -q -y install "${url}${app}" && sudo dnf -q -y --refresh install protonvpn
+        url='https://repo.protonvpn.com/fedora-39-stable/protonvpn-stable-release/'
+        app='protonvpn-stable-release-1.0.1-2.noarch.rpm'
+        sudo dnf -q -y install "${url}${app}" && sudo dnf -q -y --refresh install proton-vpn-gnome-desktop
 
     elif [ "$USE_APT" = 'True' ]; then
         url='https://repo.protonvpn.com/debian/dists/stable/main/binary-all/'
-        app='protonvpn-stable-release_1.0.3_all.deb'
+        app='protonvpn-stable-release_1.0.3-2_all.deb'
         wget -q "${url}${app}" \
             && sudo apt-get -qq --option "$WAIT_APT" install "./$app" \
             && sudo apt-get -qq update \
-            && sudo apt-get -qq install protonvpn
+            && sudo apt-get -qq install proton-vpn-gnome-desktop
         rm --force -- "$app"
     fi
 }
 
 # https://reference.wolfram.com/language/tutorial/InstallingMathematica.html
-install_wolfram_alpha() {
-    if is_installed 'wolframalphanb' || ! reply_yes 'Install Wolfram Alpha? (needs license)'; then
+install_wolfram_mathematica() {
+    if is_installed 'mathematica' || ! reply_yes 'Install Mathematica? (needs license)'; then
         return 0
     fi
 
-    url='https://account.wolfram.com/dl/WolframAlphaNotebookEdition?platform=Linux'
+    url='https://account.wolfram.com/dl/Mathematica?platform=Linux'
     xdg-open "$url" 1>/dev/null 2>/dev/null
     printf 'When the download finishes, press enter to continue. '
     read_silent
 
-    app=$(find "${HOME}/Downloads" -type f -name 'WolframAlphaNotebook_*_LINUX.sh' -print -quit)
+    app=$(find "${HOME}/Downloads" -type f -name 'Mathematica_*_LINUX.sh' -print -quit)
     [ -f "$app" ] || return 1
-    if bash "$app" -- -auto -execdir="$USER_BIN" -selinux='n' -targetdir="${HOME}/wolfram/wolfram_alpha"; then
+    if bash "$app" -- -auto -execdir="$USER_BIN" -targetdir="${HOME}/wolfram/mathematica"; then
         rm --force -- "$app"
     fi
 }
@@ -557,52 +571,44 @@ install_apps() {
      1) media codecs            enables playing various videos (recommended)
      2) Chromium                web browser
      3) qPDF                    CLI tool for PDF files
-     4) LaTeX                   typesetting for scientific documents
-     5) Setzer                  LaTeX editor
-     6) uBlock Origin           ad content blocker (recommended)
-     7) CLion                   C and C++ IDE
-     8) Discord                 messaging (proprietary)
-     9) Extensions              manage Gnome extensions
-    10) Flatseal                manage flatpak permissions
-    11) Foliate                 ebook viewer
-    12) Gimp                    image editor
-    13) IntelliJ                Java IDE
-    14) Kdenlive                video editor
-    15) PyCharm                 Python IDE
-    16) Signal                  messaging (open source, encrypted)
-    17) Slack                   messaging (proprietary)
-    18) VLC                     reliable media player
-    19) Zoom                    video conferencing
-    20) Bitwarden               password manager
-    21) Master PDF editor       portable document format file editor
-    22) Matlab                  scientific computing software (not recommended)
-    23) Miniconda               programming environment and package manager
-    24) Night theme switcher    automatically toggle light and dark theme
-    25) Proton VPN              virtual private network
-    26) Wolfram Alpha           scientific computing software
-    27) Zotero                  reference manager
+     4) TeX Live                LaTeX typesetting for documents
+        Reccommend writing LaTeX files in IDE with the TeXiFy IDEA plugin.
+     5) uBlock Origin           ad content blocker (recommended)
+     6) Discord                 messaging (proprietary)
+     7) Extensions              manage Gnome extensions
+     8) Flatseal                manage flatpak permissions
+     9) Foliate                 ebook viewer
+    10) Gimp                    image editor
+    11) IntelliJ                Java IDE
+    12) Kdenlive                video editor
+    13) PyCharm                 Python IDE
+    14) Signal                  messaging (open source, encrypted)
+    15) Slack                   messaging (proprietary)
+    16) VLC                     reliable media player
+    17) Bitwarden               password manager
+    18) Master PDF editor       portable document format file editor
+    19) Matlab                  scientific computing software (not recommended)
+    20) Miniconda               programming environment and package manager
+    21) Night theme switcher    automatically toggle light and dark theme
+    22) Proton VPN              virtual private network
+    23) Wolfram Mathematica     scientific computing software
+    24) Zotero                  reference manager
 
 INSTALL_LIST
 
     install_media_codecs # do first
 
     if [ "$USE_DNF" = 'True' ]; then
-        if ! is_installed 'chromium' && ! is_installed 'snap' 'chromium'; then
+        if ! is_installed 'snap' 'chromium'; then
             # rpm preferred over flatpak as rpm has Wayland support and more secure sandboxing
-            if dnf repolist --enabled | grep -q -- 'rpmfusion-free'; then
-                sudo dnf install chromium-freeworld
-            else
-                sudo dnf install chromium
-            fi
+            sudo dnf install chromium
         fi
         sudo dnf install qpdf
-        sudo dnf install texlive-scheme-medium texlive-minted texlive-moderncv texlive-subfiles
-        sudo dnf install setzer
+        sudo dnf install texlive-scheme-medium texlive-moderncv texlive-subfiles
         sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
         sudo apt-get --option "$WAIT_APT" install qpdf
         sudo apt-get --option "$WAIT_APT" install texlive
-        sudo apt-get --option "$WAIT_APT" install setzer
         sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 
@@ -611,24 +617,19 @@ INSTALL_LIST
         sudo flatpak remote-add --if-not-exists flathub \
             'https://flathub.org/repo/flathub.flatpakrepo'
         sudo flatpak remote-modify --enable flathub
-        flatpak install flathub com.jetbrains.CLion
         flatpak install flathub com.discordapp.Discord
         flatpak install flathub org.gnome.Extensions
         flatpak install flathub com.github.tchx84.Flatseal
         flatpak install flathub com.github.johnfactotum.Foliate
         flatpak install flathub org.gimp.GIMP
-        flatpak install flathub com.jetbrains.IntelliJ-IDEA-Community
         flatpak install flathub org.kde.kdenlive
-        flatpak install flathub com.jetbrains.PyCharm-Community
         flatpak install flathub org.signal.Signal
         flatpak install flathub com.slack.Slack
         flatpak install flathub org.videolan.VLC
-        flatpak install flathub us.zoom.Zoom
     elif [ "$USE_SNAP" = 'True' ]; then
-        if ! is_installed 'chromium' && ! is_installed 'chromium-freeworld'; then
+        if ! is_installed 'chromium'; then
             sudo snap install chromium
         fi
-        sudo snap install clion --classic
         sudo snap install discord
         sudo snap install foliate
         sudo snap install gimp
@@ -638,7 +639,6 @@ INSTALL_LIST
         sudo snap install signal-desktop
         sudo snap install slack
         sudo snap install vlc
-        sudo snap install zoom-client
     fi
 
     install_bitwarden
@@ -647,7 +647,7 @@ INSTALL_LIST
     install_miniconda
     install_night_theme_switcher
     install_proton_vpn
-    install_wolfram_alpha
+    install_wolfram_mathematica
     install_zotero
 }
 
@@ -656,25 +656,30 @@ INSTALL_LIST
 install_jupyter_lab() {
     clear
     cat <<JUPYTER
-    Enter ${CYAN}jupyter lab${NORMAL} in the base environment to start it.
+    You can enter ${CYAN}jupyter lab${NORMAL} in the base environment to start it.
 
     Note:
     To access environments other than base in a notebook,
     install the appropriate kernel in that environment.
-    Then start jupyter lab from the base environment.
-    Select the kernel of the desired environment for the notebook.
+    Do this by typing commands like the following:
+    ${YELLOW}conda activate myenv${NORMAL}
+    ${YELLOW}conda install ipykernel${NORMAL}
+    ${YELLOW}python -m ipykernel install --user --name myenv --display-name "myenv"${NORMAL}
+    Then start jupyter lab from the base environment or the system installation.
+    You should now be able to select the kernel of the desired environmentn.
 
     You can find a list of programming language specific kernels here:
     https://docs.jupyter.org/en/latest/projects/kernels.html.
 
-    As an example, the Python kernel is ${CYAN}ipykernel${NORMAL},
-    which can be installed into the environment named ENVNAME with
-    ${CYAN}conda install --name ENVNAME ipykernel${NORMAL}
-
 JUPYTER
 
-    if is_installed 'conda'; then
-        conda install -q -y --name base jupyterlab nb_conda_kernels
+    if [ "$USE_DNF" = 'True' ]; then
+        # Fedora 39+ has Jupyter Lab in the package repos.
+        # Seems to work like installing to base environment, but with
+        # better integration with the desktop environment.
+        sudo dnf install jupyterlab
+    elif is_installed 'conda'; then
+        conda install --name base jupyterlab
     else
         printf '%s%s%s\n' "$YELLOW" 'conda not found' "$NORMAL"
     fi
@@ -754,7 +759,10 @@ MENU
             set_manager_priority
             install_apps
             ;;
-        4) install_jupyter_lab ;;
+        4)
+            set_manager_priority
+            install_jupyter_lab
+            ;;
         5) help_menu ;;
         0) exit 0 ;;
     esac

@@ -86,8 +86,6 @@ signing key.
     - `sudo mokutil --delete MOK-0002.der` would mark key 2 for deletion
     - Create a password which you will later use to delete the key
 4. On reboot, MOK management will appear
-    - The numbering of the keys in MOK management differs from step 1, so try to
-    remember an identifying detail of the akmod key to delete the correct key
 
 ---
 
@@ -136,8 +134,12 @@ both output and input devices under sound in the settings GUI.
 ## Recommended web browser extensions
 
 - [Bitwarden](https://bitwarden.com/download/)
+- [Old reddit redirect](https://github.com/tom-james-watson/old-reddit-redirect)
 - [uBlock Origin](https://github.com/gorhill/uBlock#ublock-origin-ubo)
-    - Enable `AdGuard Annoyances` and `uBlock filters - Annoyances` filters
+    - Consider enabling `EasyList/uBO - Cookie Notices`.
+- [uBlock Origin Lite](https://chrome.google.com/webstore/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh)
+    - Use this instead of uBlock Origin on chromium based browsers.
+    - I prefer the optimal filtering mode.
 - [Zotero connector](https://www.zotero.org/download/connectors)
 
 ---
@@ -166,6 +168,9 @@ find . -type f -execdir chmod -x '{}' '+'
 
 ## Gnome Boxes virtualization
 
+Update: this issue was fixed.
+See [dependency bug](https://bugzilla.redhat.com/show_bug.cgi?id=1868818).
+
 The expected output of `gnome-boxes --checks` is:
 ```sh
 The CPU is capable of virtualization: yes
@@ -174,9 +179,6 @@ Libvirt KVM guest available: yes
 Boxes storage pool available: yes
 The SELinux context is default: yes
 ```
-
-However, the necessary dependencies are not installed on Fedora.
-See [dependency bug](https://bugzilla.redhat.com/show_bug.cgi?id=1868818).
 
 The actual output is:
 ```sh
@@ -187,6 +189,7 @@ Boxes storage pool available: no
 The SELinux context is default: yes
 ```
 
+However, the necessary dependencies are not installed on Fedora.
 Install the missing dependencies to resolve the issue.
 ```sh
 sudo dnf install libvirt-client virtdetect
@@ -207,4 +210,5 @@ ln -s "${HOME}/Documents/project/automate/source/linearize.sh" "${HOME}/.local/b
 ln -s "${HOME}/Documents/project/automate/source/mitosis.sh" "${HOME}/.local/bin/mitosis.sh"
 ln -s "${HOME}/Documents/project/automate/source/pull.sh" "${HOME}/.local/bin/pull.sh"
 ln -s "${HOME}/Documents/project/automate/source/replace.sh" "${HOME}/.local/bin/replace.sh"
+ln -s "${HOME}/Documents/project/automate/source/texformat.sh" "${HOME}/.local/bin/texformat.sh"
 ```

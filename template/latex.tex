@@ -1,0 +1,202 @@
+\documentclass{article}
+
+% ------------------------- package loading --------------------------
+%\usepackage[
+%    textwidth=13cm,
+%    top=2.25cm,
+%    bottom=2cm,
+%]{geometry}
+
+%\usepackage{booktabs}
+%\usepackage{graphicx}
+%\usepackage{tikz}
+% see xcolor documentation for package loading order
+%\usepackage{xcolor}
+% load after xcolor
+%\usepackage{listings}
+\usepackage{csquotes}
+% load after csquotes
+%\usepackage[style=alphabetic]{biblatex}
+
+% load before math related package if using theorems option
+%\usepackage{tcolorbox}
+
+% math packages
+\usepackage{diffcoeff}
+\usepackage{mathtools}
+% load after mathtools (which loads amsmath)
+\usepackage{amsthm}
+% load after any other maths or font-related package
+\usepackage[
+    math-style=ISO,
+    warnings-off={mathtools-colon, mathtools-overbracket},
+]{unicode-math}
+
+% load after most packages, in particular after font-related packages
+% makes things look better, apparently
+\usepackage{microtype}
+
+% load after most packages, in particular after biblatex, graphicx
+%\usepackage{subfiles}
+
+% almost always load last
+\usepackage{hyperref}
+\hypersetup{
+    pdfauthor={\textcopyright{}},
+    pdfdisplaydoctitle=true,
+    pdfpagemode=UseOutlines,
+    pdftitle={},
+}
+
+% ------------------------ document settings -------------------------
+% elevate missing character warnings to errors
+\tracinglostchars=3
+
+% --- code listings ---
+%\definecolor{AlmostWhite}{gray}{0.98}
+%\lstset{
+%    basicstyle={\ttfamily \scriptsize}, % or \footnotesize
+%    breaklines=true,
+%    captionpos=b,
+%    columns=fullflexible,
+%    emptylines=1,
+%    keepspaces=true,
+%    language=Python,
+%    numberblanklines=false,
+%    numbers=left,
+%    numberstyle=\tiny,
+%    showstringspaces=false,
+%    upquote=true,
+%    % syntax highlighting
+%    backgroundcolor=\color{AlmostWhite},
+%    commentstyle=\color{gray},
+%    keywordstyle=\color{blue},
+%    stringstyle=\color{teal},
+%}
+
+% --- math commands ---
+% begin patch for amsthm bug
+\makeatletter
+\RenewDocumentEnvironment{proof}{O{\proofname}}{\par
+    \pushQED{\qed}%
+    \normalfont \topsep6\p@\@plus6\p@\relax
+    \trivlist
+    \item\relax
+        {\itshape
+    #1\@addpunct{.}}\hspace\labelsep\ignorespaces
+}{\popQED\endtrivlist\@endpefalse}
+\makeatother
+% end patch for amsthm bug
+\NewDocumentEnvironment{solution}{}{\begin{proof}[Solution]}{\end{proof}}
+
+% begin patch for unicode-math bug
+% https://tex.stackexchange.com/questions/547584/unicode-math-swallows-my-backslash
+\AtBeginDocument{\RenewDocumentCommand{\setminus}{}{\smallsetminus}}
+% end patch for unicode-math bug
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\NewDocumentCommand{\lemmaautorefname}{}{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\NewDocumentCommand{\definitionautorefname}{}{Definition}
+\newtheorem{problem}{Problem}
+\NewDocumentCommand{\problemautorefname}{}{Problem}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+% --- universal constants (not variables) ---
+\NewDocumentCommand{\e}{}{\symrm{e}}
+\NewDocumentCommand{\im}{}{\symrm{i}}
+\NewDocumentCommand{\cpi}{}{\symrm{\pi}}
+
+% --- common math notation ---
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\group}{\lparen}{\rparen}
+\DeclarePairedDelimiter{\groupbrack}{\lbrack}{\rbrack}
+% see mathtools package section 3.6 for explanation of the below set command
+% just to make sure it exists
+\ProvideDocumentCommand{\given}{}{}
+% can be useful to refer to this outside \set
+\NewDocumentCommand{\setSymbol}{o}{
+    \mathchoice{\:}{\:}{\,}{\,}\IfValueT{#1}{#1}\vert
+    \allowbreak
+    \mathchoice{\:}{\:}{\,}{\,}
+    \mathopen{}}
+\DeclarePairedDelimiterX{\set}[1]{\lbrace}{\rbrace}{%
+    \RenewDocumentCommand{\given}{}{\setSymbol[\delimsize]}
+    #1
+}
+% intervals
+\DeclarePairedDelimiterX{\closeint}[2]{\lbrack}{\rbrack}{#1, #2}
+\DeclarePairedDelimiterX{\openint}[2]{\lparen}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\clopenint}[2]{\lbrack}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\openclint}[2]{\lparen}{\rbrack}{#1, #2}
+% inner product
+\DeclarePairedDelimiterX{\innerp}[2]{\langle}{\rangle}{#1, #2}
+% sign function
+\DeclareMathOperator{\sign}{sign}
+% natural numbers from 1 to given argument
+\NewDocumentCommand{\nats}{m}{\symbb{N} \cap \closeint{1}{#1}}
+% integers from 0 to given argument
+\NewDocumentCommand{\ints}{m}{\symbb{Z} \cap \closeint{0}{#1}}
+
+% --- linear algebra ---
+% transpose
+\NewDocumentCommand{\trans}{m}{{#1}^{\mathsf{T}}}
+% Hermitian (conjugate) transpose
+\NewDocumentCommand{\herm}{m}{{#1}^{\mathsf{H}}}
+% image of argument (subset of codomain)
+\DeclareMathOperator{\image}{image}
+% rank of matrix
+\DeclareMathOperator{\rank}{rank}
+% dimension of kernel
+\DeclareMathOperator{\nullity}{nullity}
+% sum of diagonal of matrix
+\DeclareMathOperator{\trace}{trace}
+% diagonal matrix of argument
+\DeclareMathOperator{\diag}{diag}
+% bold vectors
+\AtBeginDocument{\RenewDocumentCommand{\vec}{m}{\symbf{#1}}}
+
+% --- probability ---
+\NewCommandCopy{\PrSymbol}{\Pr}
+\RenewDocumentCommand{\Pr}{som}{\PrSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+% expectation
+\DeclareMathOperator*{\ExSymbol}{Ex}
+\NewDocumentCommand{\Ex}{som}{\ExSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+% covariance
+\DeclareMathOperator*{\CovSymbol}{cov}
+\NewDocumentCommand{\cov}{som}{\CovSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+
+% --- common operators in machine learning ---
+% boolean indicator function, 1 if given argument is true and 0 otherwise
+\NewDocumentCommand{\bool}{m}{\symbb{1}_{#1}}
+% risk or error, defined as expectation of loss function
+\NewDocumentCommand{\risk}{sO{\symcal{D}}om}{L\IfValueT{#3}{^{\text{#3}}}_{#2} \IfBooleanTF{#1}{\group*{#4}}{\group{#4}}}
+% hypothesis class
+\NewDocumentCommand{\hypo}{O{H}}{\symcal{#1}}
+% positive function, like sign function but not ambiguous for zero
+\DeclareMathOperator{\pos}{pos}
+% VC-dimension
+\DeclareMathOperator{\vcdim}{VCdim}
+\DeclareMathOperator{\softargmax}{s_{argmax}}
+
+% --- complex analysis ---
+% residue
+\DeclareMathOperator{\res}{res}
+
+% ------------------------- document content -------------------------
+\author{}
+\title{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\end{document}
