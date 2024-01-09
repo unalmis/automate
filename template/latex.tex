@@ -7,16 +7,16 @@
 %    bottom=2cm,
 %]{geometry}
 
-%\usepackage{booktabs}
+\usepackage{booktabs}
 %\usepackage{graphicx}
 %\usepackage{tikz}
 % see xcolor documentation for package loading order
-%\usepackage{xcolor}
+\usepackage{xcolor}
 % load after xcolor
-%\usepackage{listings}
+\usepackage{listings}
 \usepackage{csquotes}
 % load after csquotes
-%\usepackage[style=alphabetic]{biblatex}
+\usepackage[style=alphabetic]{biblatex}
 
 % load before math related package if using theorems option
 %\usepackage{tcolorbox}
@@ -42,7 +42,7 @@
 % almost always load last
 \usepackage{hyperref}
 \hypersetup{
-    pdfauthor={\textcopyright{}},
+    pdfauthor={},
     pdfdisplaydoctitle=true,
     pdfpagemode=UseOutlines,
     pdftitle={},
@@ -53,26 +53,26 @@
 \tracinglostchars=3
 
 % --- code listings ---
-%\definecolor{AlmostWhite}{gray}{0.98}
-%\lstset{
-%    basicstyle={\ttfamily \scriptsize}, % or \footnotesize
-%    breaklines=true,
-%    captionpos=b,
-%    columns=fullflexible,
-%    emptylines=1,
-%    keepspaces=true,
-%    language=Python,
-%    numberblanklines=false,
-%    numbers=left,
-%    numberstyle=\tiny,
-%    showstringspaces=false,
-%    upquote=true,
-%    % syntax highlighting
-%    backgroundcolor=\color{AlmostWhite},
-%    commentstyle=\color{gray},
-%    keywordstyle=\color{blue},
-%    stringstyle=\color{teal},
-%}
+\definecolor{AlmostWhite}{gray}{0.98}
+\lstset{
+    basicstyle={\ttfamily \scriptsize},
+    breaklines=true,
+    captionpos=b,
+    columns=fullflexible,
+    emptylines=1,
+    keepspaces=true,
+    language=Python,
+    numberblanklines=false,
+    numbers=left,
+    numberstyle=\tiny,
+    showstringspaces=false,
+    upquote=true,
+    % syntax highlighting
+    backgroundcolor=\color{AlmostWhite},
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{teal},
+}
 
 % --- math commands ---
 % begin patch for amsthm bug
@@ -170,8 +170,8 @@
 \DeclareMathOperator*{\ExSymbol}{Ex}
 \NewDocumentCommand{\Ex}{som}{\ExSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
 % covariance
-\DeclareMathOperator*{\CovSymbol}{cov}
-\NewDocumentCommand{\cov}{som}{\CovSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+\DeclareMathOperator*{\CovSymbol}{Cov}
+\NewDocumentCommand{\Cov}{som}{\CovSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
 
 % --- common operators in machine learning ---
 % boolean indicator function, 1 if given argument is true and 0 otherwise
