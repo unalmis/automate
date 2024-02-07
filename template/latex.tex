@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{report} % another option is article
 
 % ------------------------- package loading --------------------------
 %\usepackage[
@@ -7,7 +7,7 @@
 %    bottom=2cm,
 %]{geometry}
 
-\usepackage{booktabs}
+%\usepackage{booktabs}
 %\usepackage{graphicx}
 %\usepackage{tikz}
 % see xcolor documentation for package loading order
@@ -19,7 +19,7 @@
 \usepackage[style=alphabetic]{biblatex}
 
 % load before math related package if using theorems option
-%\usepackage{tcolorbox}
+\usepackage{tcolorbox}
 
 % math packages
 \usepackage{diffcoeff}
@@ -37,11 +37,12 @@
 \usepackage{microtype}
 
 % load after most packages, in particular after biblatex, graphicx
-%\usepackage{subfiles}
+\usepackage{subfiles}
 
 % almost always load last
 \usepackage{hyperref}
 \hypersetup{
+    colorlinks,
     pdfauthor={},
     pdfdisplaydoctitle=true,
     pdfpagemode=UseOutlines,
@@ -60,6 +61,7 @@
     captionpos=b,
     columns=fullflexible,
     emptylines=1,
+    % float, % can add this inside options of individual listings
     keepspaces=true,
     language=Python,
     numberblanklines=false,
@@ -191,12 +193,25 @@
 \DeclareMathOperator{\res}{res}
 
 % ------------------------- document content -------------------------
-\author{}
-\title{}
-\date{\today}
+%\NewTColorBox{readbox}{}{title=Read}
+%\RenewDocumentCommand{\chaptername}{}{Problem set}
+%\addbibresource{\subfix{citation.bib}}
+%\pagestyle{myheadings}
+%\markright{\hfill}
+%\author{}
+%\title{}
+%\date{\today}
+%\AtBeginDocument{\RenewDocumentCommand{\abstractname}{}{Preface}}
 
 \begin{document}
 
-\maketitle
+%\pagenumbering{roman}
+%\maketitle
+%\subfile{copyright}
+%\tableofcontents
+%\lstlistoflistings
+%\printbibliography
+%\clearpage
+%\pagenumbering{arabic}
 
 \end{document}
