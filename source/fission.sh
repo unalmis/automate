@@ -393,7 +393,7 @@ MATLAB
         printf 'When the download finishes, press enter to continue. '
         read_silent
 
-        app_zip=$(find "${HOME}/Downloads" -type f -name 'matlab_R*_glnxa64.zip' -print -quit)
+        app_zip=$(find "${HOME}/Downloads" -type f -name 'matlab_R*_Linux.zip' -print -quit)
         [ -f "$app_zip" ] && unzip -q "$app_zip" -d "$app_tmp"
         rm --force -- "$app_zip"
     fi
