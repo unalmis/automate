@@ -490,12 +490,12 @@ install_night_theme_switcher() {
     is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
-    if [ "$gnome_version" -eq 45 ] 2>/dev/null; then
+    if [ "$gnome_version" -eq 46 ] 2>/dev/null; then
+        app_version='76'
+    elif [ "$gnome_version" -eq 45 ] 2>/dev/null; then
         app_version='75'
     elif [ "$gnome_version" -eq 44 ] 2>/dev/null; then
         app_version='74'
-    elif [ "$gnome_version" -eq 43 ] 2>/dev/null; then
-        app_version='73'
     else
         return 1
     fi
