@@ -31,7 +31,7 @@ A terminal program that helps set up and maintain RPM or Debian based systems.
 - it takes too long to get a fresh system to a state where you can do stuff
 - it drains your attention to remember details
 - it requires going down a rabbit hole to properly use `jupyter lab` in `conda`
-- it is better for a program to set up your parent's, sister's, or dog's system
+- it is better for a program to set up your parent's or sister's system
 - __fission.sh__ makes Linux more appealing to newcomers
 - __fission.sh__ improves systems that would otherwise not be
 - __fission.sh__ helps avoid _weeks_ of troubleshooting
@@ -66,3 +66,9 @@ Updates local repositories in the current directory, recursively.
 ### replace.sh
 
 Replaces strings in files in the current directory, recursively.
+
+---
+
+### texformat.sh
+
+Format tex files and delete junk compilation files in the current directory, recursively.
