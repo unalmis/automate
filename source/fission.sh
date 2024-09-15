@@ -343,7 +343,7 @@ install_master_pdf_editor() {
 
     # code used to install before remote repository was available
     # url='https://code-industry.net/public/'
-    # app="master-pdf-editor-5.9.50-1-qt5.$(arch)"
+    # app="master-pdf-editor-5.9.82-qt5.$(arch)"
     # if [ "$USE_DNF" = 'True' ]; then
     #     sudo dnf -q -y install "${url}${app}.rpm"
     # elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
@@ -517,7 +517,7 @@ install_proton_vpn() {
 
     elif [ "$USE_APT" = 'True' ]; then
         url='https://repo.protonvpn.com/debian/dists/stable/main/binary-all/'
-        app='protonvpn-stable-release_1.0.3-2_all.deb'
+        app='protonvpn-stable-release_1.0.4_all.deb'
         wget -q "${url}${app}" \
             && sudo apt-get -qq --option "$WAIT_APT" install "./$app" \
             && sudo apt-get -qq update \
