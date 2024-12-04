@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: Automation Programs
+title: "Automation Programs"
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
@@ -10,3 +10,5 @@ authors:
     email: kayaunalmis@proton.me
     orcid: 'https://orcid.org/0000-0002-1755-6764'
 license: GPL-3.0-or-later
+date-released: 2022-11-22
+url: "https://github.com/unalmis/automate"
