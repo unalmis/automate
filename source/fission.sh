@@ -312,29 +312,6 @@ upgrade_system() {
 
 # ------------------------------------------------------------------------------
 
-# https://bitwarden.com/download/
-install_bitwarden() {
-    if [ "$USE_SNAP" = 'True' ]; then
-        sudo snap install bitwarden
-        return
-    fi
-
-    if [ -d "$APPIMAGE_PATH" ]; then
-        app=$(find "$APPIMAGE_PATH" -type f -iname 'Bitwarden*.AppImage' -print -quit)
-        [ -f "$app" ] && return 0 # already installed
-    fi
-    reply_yes 'Install Bitwarden?' || return 0
-
-    app='Bitwarden.AppImage'
-    url='https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=appimage'
-    if wget -q --output-document "$app" "$url"; then
-        chmod +x "$app"
-        mkdir --parents "$APPIMAGE_PATH"
-        mv "$app" "$APPIMAGE_PATH"
-        printf '%s %s%s%s\n' 'Downloaded to' "$CYAN" "${APPIMAGE_PATH}${app}" "$NORMAL"
-    fi
-}
-
 # https://code-industry.net/free-pdf-editor/
 install_master_pdf_editor() {
     if is_installed 'masterpdfeditor5' || ! reply_yes 'Install Master PDF editor?'; then
@@ -431,12 +408,20 @@ install_media_codecs() {
         version=$(rpm --eval %fedora)
         sudo dnf -y install "${free}${version}.noarch.rpm"
         sudo dnf install "${nonfree}${version}.noarch.rpm"
-        sudo dnf group upgrade core # show rpm fusion repositories in software GUI
+        # rpm fusion ffmpeg is now built against libopenh264, so openh264 is needed
+        fedora_version=$(grep -- 'VERSION_ID' '/etc/os-release' | rev | cut --characters -2 | rev)
+        if [ "$fedora_version" -ge 41 ]; then
+            sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
+        else
+            sudo dnf config-manager --enable fedora-cisco-openh264
+        fi
+        sudo dnf update @core # show rpm fusion repositories in software GUI
 
         # https://rpmfusion.org/Howto/Multimedia
         sudo dnf -y swap ffmpeg-free ffmpeg --allowerasing
-        sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav \
-            gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
+        sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+        # sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
+        # The following comment is out of date, but kept for documentation.
         # https://docs.fedoraproject.org/en-US/quick-docs/assembly_installing-plugins-for-playing-movies-and-music/
         # Although recommended in the link above, we forgo installing the packages listed below.
         # 1. 'Multimedia' group no longer exists.
@@ -490,12 +475,12 @@ install_night_theme_switcher() {
     is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
-    if [ "$gnome_version" -eq 46 ] 2>/dev/null; then
+    if [ "$gnome_version" -eq 47 ] 2>/dev/null; then
+        app_version='78'
+    elif [ "$gnome_version" -eq 46 ] 2>/dev/null; then
         app_version='77'
     elif [ "$gnome_version" -eq 45 ] 2>/dev/null; then
         app_version='75'
-    elif [ "$gnome_version" -eq 44 ] 2>/dev/null; then
-        app_version='74'
     else
         return 1
     fi
@@ -511,13 +496,13 @@ install_proton_vpn() {
     fi
 
     if [ "$USE_DNF" = 'True' ]; then
-        url='https://repo.protonvpn.com/fedora-39-stable/protonvpn-stable-release/'
-        app='protonvpn-stable-release-1.0.1-2.noarch.rpm'
+        url="https://repo.protonvpn.com/fedora-$(cat /etc/fedora-release | cut -d' ' -f 3)-"
+        app='protonvpn-stable-release-1.0.2-1.noarch.rpm'
         sudo dnf -q -y install "${url}${app}" && sudo dnf -q -y --refresh install proton-vpn-gnome-desktop
 
     elif [ "$USE_APT" = 'True' ]; then
         url='https://repo.protonvpn.com/debian/dists/stable/main/binary-all/'
-        app='protonvpn-stable-release_1.0.4_all.deb'
+        app='protonvpn-stable-release_1.0.6_all.deb'
         wget -q "${url}${app}" \
             && sudo apt-get -qq --option "$WAIT_APT" install "./$app" \
             && sudo apt-get -qq update \
@@ -574,18 +559,18 @@ install_apps() {
      4) TeX Live                LaTeX typesetting for documents
         Reccommend writing LaTeX files in IDE with the TeXiFy IDEA plugin.
      5) uBlock Origin           ad content blocker (recommended)
-     6) Discord                 messaging (proprietary)
-     7) Extensions              manage Gnome extensions
-     8) Flatseal                manage flatpak permissions
-     9) Foliate                 ebook viewer
-    10) Gimp                    image editor
-    11) IntelliJ                Java IDE
-    12) Kdenlive                video editor
-    13) PyCharm                 Python IDE
-    14) Signal                  messaging (open source, encrypted)
-    15) Slack                   messaging (proprietary)
-    16) VLC                     reliable media player
-    17) Bitwarden               password manager
+     6) Bitwarden               password manager
+     7) Discord                 messaging (proprietary)
+     8) Extensions              manage Gnome extensions
+     9) Flatseal                manage flatpak permissions
+    10) Foliate                 ebook viewer
+    11) Gimp                    image editor
+    12) IntelliJ                Java IDE
+    13) Kdenlive                video editor
+    14) PyCharm                 Python IDE
+    15) Signal                  messaging (open source, encrypted)
+    16) Slack                   messaging (proprietary)
+    17) VLC                     reliable media player
     18) Master PDF editor       portable document format file editor
     19) Matlab                  scientific computing software (not recommended)
     20) Miniconda               programming environment and package manager
@@ -617,6 +602,7 @@ INSTALL_LIST
         sudo flatpak remote-add --if-not-exists flathub \
             'https://flathub.org/repo/flathub.flatpakrepo'
         sudo flatpak remote-modify --enable flathub
+        flatpak install flathub com.bitwarden.desktop
         flatpak install flathub com.discordapp.Discord
         flatpak install flathub org.gnome.Extensions
         flatpak install flathub com.github.tchx84.Flatseal
@@ -630,6 +616,7 @@ INSTALL_LIST
         if ! is_installed 'chromium'; then
             sudo snap install chromium
         fi
+        sudo snap install bitwarden
         sudo snap install discord
         sudo snap install foliate
         sudo snap install gimp
@@ -641,7 +628,6 @@ INSTALL_LIST
         sudo snap install vlc
     fi
 
-    install_bitwarden
     install_master_pdf_editor
     install_matlab
     install_miniconda
