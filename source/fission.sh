@@ -511,26 +511,30 @@ install_proton_vpn() {
     fi
 }
 
-# https://reference.wolfram.com/language/tutorial/InstallingMathematica.html
-install_wolfram_mathematica() {
-    if is_installed 'mathematica' || ! reply_yes 'Install Mathematica? (needs license)'; then
+# https://reference.wolfram.com/language/tutorial/InstallingWolfram.html
+install_wolfram() {
+    if is_installed 'wolframnb' || ! reply_yes 'Install Wolfram? (needs license)'; then
         return 0
     fi
 
-    url='https://account.wolfram.com/dl/Mathematica?platform=Linux'
+    url='https://account.wolfram.com/dl/WolframApp?platform=Linux'
     xdg-open "$url" 1>/dev/null 2>/dev/null
     printf 'When the download finishes, press enter to continue. '
     read_silent
 
-    app=$(find "${HOME}/Downloads" -type f -name 'Mathematica_*_LINUX.sh' -print -quit)
+    app=$(find "${HOME}/Downloads" -type f -name 'Wolfram_*_LIN*.sh' -print -quit)
     [ -f "$app" ] || return 1
-    if bash "$app" -- -auto -execdir="$USER_BIN" -targetdir="${HOME}/wolfram/mathematica"; then
+    if bash "$app" -- -auto -execdir="$USER_BIN" -targetdir="${HOME}/wolfram"; then
         rm --force -- "$app"
     fi
 }
 
 # https://www.zotero.org/
 install_zotero() {
+    if ! reply_yes 'Install Zotero?'; then
+        return 0
+    fi
+
     oxt_name='Zotero_OpenOffice_Integration.oxt'
     if [ "$USE_FLAT" = 'True' ] && flatpak install flathub org.zotero.Zotero; then
         oxt=$(find '/var/lib/flatpak/app/org.zotero.Zotero' -type f -name "$oxt_name" -print -quit)
@@ -557,7 +561,6 @@ install_apps() {
      2) Chromium                web browser
      3) qPDF                    CLI tool for PDF files
      4) TeX Live                LaTeX typesetting for documents
-        Reccommend writing LaTeX files in IDE with the TeXiFy IDEA plugin.
      5) uBlock Origin           ad content blocker (recommended)
      6) Bitwarden               password manager
      7) Discord                 messaging (proprietary)
@@ -576,7 +579,7 @@ install_apps() {
     20) Miniconda               programming environment and package manager
     21) Night theme switcher    automatically toggle light and dark theme
     22) Proton VPN              virtual private network
-    23) Wolfram Mathematica     scientific computing software
+    23) Wolfram                 scientific computing software
     24) Zotero                  reference manager
 
 INSTALL_LIST
@@ -586,46 +589,47 @@ INSTALL_LIST
     if [ "$USE_DNF" = 'True' ]; then
         if ! is_installed 'snap' 'chromium'; then
             # rpm preferred over flatpak as rpm has Wayland support and more secure sandboxing
-            sudo dnf install chromium
+            reply_yes 'Install Chromium?' && sudo dnf install chromium
         fi
-        sudo dnf install qpdf
-        sudo dnf install texlive-scheme-medium texlive-moderncv texlive-subfiles
-        sudo dnf install mozilla-ublock-origin
+        reply_yes 'Install qPDF?'          && sudo dnf install qpdf
+        # Reccommend writing LaTeX files in IDE with the TeXiFy IDEA plugin.
+        reply_yes 'Install TeX Live?'      && sudo dnf install texlive-scheme-medium texlive-moderncv texlive-subfiles
+        reply_yes 'Install uBlock Origin?' && sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
-        sudo apt-get --option "$WAIT_APT" install qpdf
-        sudo apt-get --option "$WAIT_APT" install texlive
-        sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
+        reply_yes 'Install qPDF?'          && sudo apt-get --option "$WAIT_APT" install qpdf
+        reply_yes 'Install TeX Live?'      && sudo apt-get --option "$WAIT_APT" install texlive
+        reply_yes 'Install uBlock Origin?' && sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 
     # flatpak and snap provide sandboxing, making them more secure than rpm or deb
     if [ "$USE_FLAT" = 'True' ]; then
-        sudo flatpak remote-add --if-not-exists flathub \
-            'https://flathub.org/repo/flathub.flatpakrepo'
-        sudo flatpak remote-modify --enable flathub
-        flatpak install flathub com.bitwarden.desktop
-        flatpak install flathub com.discordapp.Discord
-        flatpak install flathub org.gnome.Extensions
-        flatpak install flathub com.github.tchx84.Flatseal
-        flatpak install flathub com.github.johnfactotum.Foliate
-        flatpak install flathub org.gimp.GIMP
-        flatpak install flathub org.kde.kdenlive
-        flatpak install flathub org.signal.Signal
-        flatpak install flathub com.slack.Slack
-        flatpak install flathub org.videolan.VLC
+        reply_yes 'Add Flathub repository? (required for flatpak)' \
+            && sudo flatpak remote-add --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo' \
+            && sudo flatpak remote-modify --enable flathub
+        reply_yes 'Install Bitwarden?'  && flatpak install flathub com.bitwarden.desktop
+        reply_yes 'Install Discord?'    && flatpak install flathub com.discordapp.Discord
+        reply_yes 'Install Extensions?' && flatpak install flathub org.gnome.Extensions
+        reply_yes 'Install Flatseal?'   && flatpak install flathub com.github.tchx84.Flatseal
+        reply_yes 'Install Foliate?'    && flatpak install flathub com.github.johnfactotum.Foliate
+        reply_yes 'Install Gimp?'       && flatpak install flathub org.gimp.GIMP
+        reply_yes 'Install Kdenlive?'   && flatpak install flathub org.kde.kdenlive
+        reply_yes 'Install Signal?'     && flatpak install flathub org.signal.Signal
+        reply_yes 'Install Slack?'      && flatpak install flathub com.slack.Slack
+        reply_yes 'Install VLC?'        && flatpak install flathub org.videolan.VLC
     elif [ "$USE_SNAP" = 'True' ]; then
         if ! is_installed 'chromium'; then
-            sudo snap install chromium
+            reply_yes 'Install Chromium?' && sudo snap install chromium
         fi
-        sudo snap install bitwarden
-        sudo snap install discord
-        sudo snap install foliate
-        sudo snap install gimp
-        sudo snap install intellij-idea-community --classic
-        sudo snap install kdenlive
-        sudo snap install pycharm-community --classic
-        sudo snap install signal-desktop
-        sudo snap install slack
-        sudo snap install vlc
+        reply_yes 'Install Bitwarden?' && sudo snap install bitwarden
+        reply_yes 'Install Discord?'   && sudo snap install discord
+        reply_yes 'Install Foliate?'   && sudo snap install foliate
+        reply_yes 'Install Gimp?'      && sudo snap install gimp
+        reply_yes 'Install IntelliJ?'  && sudo snap install intellij-idea-community --classic
+        reply_yes 'Install Kdenlive?'  && sudo snap install kdenlive
+        reply_yes 'Install PyCharm?'   && sudo snap install pycharm-community --classic
+        reply_yes 'Install Signal?'    && sudo snap install signal-desktop
+        reply_yes 'Install Slack?'     && sudo snap install slack
+        reply_yes 'Install VLC?'       && sudo snap install vlc
     fi
 
     install_master_pdf_editor
@@ -633,7 +637,7 @@ INSTALL_LIST
     install_miniconda
     install_night_theme_switcher
     install_proton_vpn
-    install_wolfram_mathematica
+    install_wolfram
     install_zotero
 }
 
