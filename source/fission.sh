@@ -351,7 +351,10 @@ install_matlab() {
 
     cat <<MATLAB
 
-    The matlab GUI installer will ask some questions.
+    The matlab installer does not support Wayland; Xwayland is required.
+    We will attempt to automatically launch matlab using an Xwayland session.
+
+    The installer will ask some questions.
     You should answer:
     1. Set login name to ${CYAN}${USER}${NORMAL}
     2. Set installation destination to ${CYAN}${HOME}/matlab${NORMAL}
@@ -364,30 +367,16 @@ install_matlab() {
 
 MATLAB
 
-    app_tmp="${HOME}/Downloads/matlab_tmp"
-    if [ ! -d "$app_tmp" ]; then
-        xdg-open 'https://www.mathworks.com/downloads/' 1>/dev/null 2>/dev/null
-        printf 'When the download finishes, press enter to continue. '
-        read_silent
-
-        app_zip=$(find "${HOME}/Downloads" -type f -name 'matlab_R*_Linux.zip' -print -quit)
-        [ -f "$app_zip" ] && unzip -q "$app_zip" -d "$app_tmp"
-        rm --force -- "$app_zip"
-    fi
-    if [ -d "$app_tmp" ]; then
-        # remove incompatible library, then install
-        # https://wiki.archlinux.org/title/MATLAB#Unable_to_launch_the_MATLABWindow_application
-        rm --force -- "${app_tmp}/bin/glnxa64/libfreetype.so"*
-        bash "${app_tmp}/install"
-    fi
-    # add desktop entry
-    if is_installed 'matlab'; then
+    if [ ! -d "${HOME}/matlab" ] && wget -q 'https://www.mathworks.com/mpm/glnxa64/mpm'; then
+        chmod +x mpm
+        ./mpm install --release=R2024b --destination="${HOME}/matlab" --products=MATLAB
+        # add desktop entry
         tee "${HOME}/.local/share/applications/matlab.desktop" 1>/dev/null <<DESKTOP
 [Desktop Entry]
 Type=Application
 Terminal=false
 MimeType=text/x-matlab
-Exec=${HOME}/matlab/bin/matlab -desktop
+Exec=env XDG_SESSION_TYPE=xwayland ${HOME}/matlab/bin/matlab -desktop
 Name=Matlab
 Comment=scientific computing software
 StartupNotify=true
@@ -575,7 +564,7 @@ install_apps() {
     16) Slack                   messaging (proprietary)
     17) VLC                     reliable media player
     18) Master PDF editor       portable document format file editor
-    19) Matlab                  scientific computing software (not recommended)
+    19) Matlab                  scientific computing software
     20) Miniconda               programming environment and package manager
     21) Night theme switcher    automatically toggle light and dark theme
     22) Proton VPN              virtual private network
