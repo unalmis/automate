@@ -464,12 +464,12 @@ install_night_theme_switcher() {
     is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
-    if [ "$gnome_version" -eq 47 ] 2>/dev/null; then
+    if [ "$gnome_version" -eq 48 ] 2>/dev/null; then
+        app_version='79'
+    elif [ "$gnome_version" -eq 47 ] 2>/dev/null; then
         app_version='78'
     elif [ "$gnome_version" -eq 46 ] 2>/dev/null; then
         app_version='77'
-    elif [ "$gnome_version" -eq 45 ] 2>/dev/null; then
-        app_version='75'
     else
         return 1
     fi
@@ -486,12 +486,12 @@ install_proton_vpn() {
 
     if [ "$USE_DNF" = 'True' ]; then
         url="https://repo.protonvpn.com/fedora-$(cat /etc/fedora-release | cut -d' ' -f 3)-"
-        app='protonvpn-stable-release-1.0.2-1.noarch.rpm'
+        app='protonvpn-stable-release-1.0.3-1.noarch.rpm'
         sudo dnf -q -y install "${url}${app}" && sudo dnf -q -y --refresh install proton-vpn-gnome-desktop
 
     elif [ "$USE_APT" = 'True' ]; then
         url='https://repo.protonvpn.com/debian/dists/stable/main/binary-all/'
-        app='protonvpn-stable-release_1.0.6_all.deb'
+        app='protonvpn-stable-release_1.0.8_all.deb'
         wget -q "${url}${app}" \
             && sudo apt-get -qq --option "$WAIT_APT" install "./$app" \
             && sudo apt-get -qq update \
