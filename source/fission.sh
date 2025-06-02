@@ -16,9 +16,6 @@
 # https://www.freedesktop.org/software/systemd/man/file-hierarchy.html#~/.local/bin/
 USER_BIN="${HOME}/.local/bin"
 
-# path to store .AppImage files (feel free to change)
-APPIMAGE_PATH="${HOME}/appimage/"
-
 # To avoid use of multiple system package managers,
 # the set_manager_priority() function assigns which ones to use.
 USE_DNF='False'
@@ -642,6 +639,14 @@ INSTALL_LIST
     fi
 
     install_vscodium
+    if is_installed 'codium'; then
+        reply_yes 'Install ms-python.python?'           && codium --install-extension ms-python.python
+        reply_yes 'Install ms-python.debugpy?'          && codium --install-extension ms-python.debugpy
+        reply_yes 'Install charliermarsh.ruff?'         && codium --install-extension charliermarsh.ruff
+        reply_yes 'Install timonwong.shellcheck?'       && codium --install-extension timonwong.shellcheck
+        reply_yes 'Install james-yu.latex-workshop?'    && codium --install-extension james-yu.latex-workshop
+        reply_yes 'Install github.github-vscode-theme?' && codium --install-extension github.github-vscode-theme
+    fi
     install_master_pdf_editor
     install_matlab
     install_miniconda
@@ -666,7 +671,10 @@ install_jupyter_lab() {
     ${YELLOW}conda install ipykernel${NORMAL}
     ${YELLOW}python -m ipykernel install --user --name myenv --display-name "myenv"${NORMAL}
     Then start jupyter lab from the base environment or the system installation.
-    You should now be able to select the kernel of the desired environmentn.
+    You should now be able to select the kernel of the desired environment.
+
+    If you would like to remove the installed environement, use
+    ${YELLOW}jupyter kernelspec remove myenv${NORMAL}
 
     You can find a list of programming language specific kernels here:
     https://docs.jupyter.org/en/latest/projects/kernels.html.
