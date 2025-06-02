@@ -312,6 +312,29 @@ upgrade_system() {
 
 # ------------------------------------------------------------------------------
 
+install_vscodium() {
+    if is_installed 'snap' 'codium' || ! reply_yes 'Install VS Codium?'; then
+        return 0
+    fi
+
+    if [ "$USE_SNAP" = 'True' ]; then
+        snap install codium --classic
+    elif [ "$USE_DNF" = 'True' ]; then
+        # https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo
+        sudo tee -a /etc/yum.repos.d/vscodium.repo << 'EOF'
+[gitlab.com_paulcarroty_vscodium_repo]
+name=gitlab.com_paulcarroty_vscodium_repo
+baseurl=https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+metadata_expire=1h
+EOF
+        sudo dnf install codium
+    fi
+}
+
 # https://code-industry.net/free-pdf-editor/
 install_master_pdf_editor() {
     if is_installed 'masterpdfeditor5' || ! reply_yes 'Install Master PDF editor?'; then
@@ -557,19 +580,18 @@ install_apps() {
      9) Flatseal                manage flatpak permissions
     10) Foliate                 ebook viewer
     11) Gimp                    image editor
-    12) IntelliJ                Java IDE
-    13) Kdenlive                video editor
-    14) PyCharm                 Python IDE
-    15) Signal                  messaging (open source, encrypted)
-    16) Slack                   messaging (proprietary)
-    17) VLC                     reliable media player
-    18) Master PDF editor       portable document format file editor
-    19) Matlab                  scientific computing software
-    20) Miniconda               programming environment and package manager
-    21) Night theme switcher    automatically toggle light and dark theme
-    22) Proton VPN              virtual private network
-    23) Wolfram                 scientific computing software
-    24) Zotero                  reference manager
+    12) Kdenlive                video editor
+    13) Signal                  messaging (open source, encrypted)
+    14) Slack                   messaging (proprietary)
+    15) VLC                     reliable media player
+    16) VS Codium               code editor
+    17) Master PDF editor       portable document format file editor
+    18) Matlab                  scientific computing software
+    19) Miniconda               programming environment and package manager
+    20) Night theme switcher    automatically toggle light and dark theme
+    21) Proton VPN              virtual private network
+    22) Wolfram                 scientific computing software
+    23) Zotero                  reference manager
 
 INSTALL_LIST
 
@@ -581,7 +603,6 @@ INSTALL_LIST
             reply_yes 'Install Chromium?' && sudo dnf install chromium
         fi
         reply_yes 'Install qPDF?'          && sudo dnf install qpdf
-        # Reccommend writing LaTeX files in IDE with the TeXiFy IDEA plugin.
         reply_yes 'Install TeX Live?'      && sudo dnf install texlive-scheme-medium texlive-moderncv texlive-subfiles
         reply_yes 'Install uBlock Origin?' && sudo dnf install mozilla-ublock-origin
     elif [ "$USE_APT" = 'True' ]; then
@@ -613,14 +634,13 @@ INSTALL_LIST
         reply_yes 'Install Discord?'   && sudo snap install discord
         reply_yes 'Install Foliate?'   && sudo snap install foliate
         reply_yes 'Install Gimp?'      && sudo snap install gimp
-        reply_yes 'Install IntelliJ?'  && sudo snap install intellij-idea-community --classic
         reply_yes 'Install Kdenlive?'  && sudo snap install kdenlive
-        reply_yes 'Install PyCharm?'   && sudo snap install pycharm-community --classic
         reply_yes 'Install Signal?'    && sudo snap install signal-desktop
         reply_yes 'Install Slack?'     && sudo snap install slack
         reply_yes 'Install VLC?'       && sudo snap install vlc
     fi
 
+    install_vscodium
     install_master_pdf_editor
     install_matlab
     install_miniconda
