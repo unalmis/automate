@@ -313,7 +313,8 @@ upgrade_system() {
 # ------------------------------------------------------------------------------
 
 install_vscodium() {
-    if is_installed 'snap' 'codium' || ! reply_yes 'Install VS Codium?'; then
+    if is_installed 'codium' || is_installed 'snap' 'codium' || \
+       ! reply_yes 'Install VS Codium?'; then
         return 0
     fi
 
