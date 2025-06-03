@@ -309,27 +309,37 @@ upgrade_system() {
 
 # ------------------------------------------------------------------------------
 
+# https://vscodium.com/#install
 install_vscodium() {
     if is_installed 'codium' || is_installed 'snap' 'codium' || \
        ! reply_yes 'Install VS Codium?'; then
         return 0
     fi
 
-    if [ "$USE_SNAP" = 'True' ]; then
+    url='https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg'
+    if [ "$USE_SNAP" = 'True' ] && reply_yes 'Install VS Codium as a snap package?'; then
         snap install codium --classic
+
+    elif [ "$USE_APT" = 'True' ] && reply_yes 'Install VS Codium as a .deb package?'; then
+        wget -q --output-document - "${url}" | gpg --dearmor \
+            | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+        echo 'deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main' \
+            | sudo tee /etc/apt/sources.list.d/vscodium.list
+        sudo apt-get -qq --option "$WAIT_APT" update && sudo apt-get -qq install codium
+
     elif [ "$USE_DNF" = 'True' ]; then
-        # https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo
-        sudo tee -a /etc/yum.repos.d/vscodium.repo << 'EOF'
+        sudo rpmkeys --import "${url}"
+        sudo tee -a /etc/yum.repos.d/vscodium.repo <<EOF
 [gitlab.com_paulcarroty_vscodium_repo]
-name=gitlab.com_paulcarroty_vscodium_repo
-baseurl=https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
+name=download.vscodium.com
+baseurl=https://download.vscodium.com/rpms/
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1
-gpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+gpgkey=${url}
 metadata_expire=1h
 EOF
-        sudo dnf install codium
+        sudo dnf -q -y install codium
     fi
 }
 
@@ -358,7 +368,7 @@ install_master_pdf_editor() {
     elif [ "$USE_APT" = 'True' ]; then
         key_path='/etc/apt/keyrings/pubmpekey.asc'
         wget -q --output-document - "${url}deb/pubmpekey.asc" | sudo tee "$key_path"
-        printf "deb [signed-by=${key_path} arch=$(dpkg --print-architecture)] ${url}deb stable main" \
+        echo "deb [signed-by=${key_path} arch=$(dpkg --print-architecture)] ${url}deb stable main" \
             | sudo tee '/etc/apt/sources.list.d/master-pdf-editor.list'
         sudo apt-get -qq --option "$WAIT_APT" update \
             && sudo apt-get -qq install master-pdf-editor-5
@@ -506,7 +516,7 @@ install_proton_vpn() {
     fi
 
     if [ "$USE_DNF" = 'True' ]; then
-        url="https://repo.protonvpn.com/fedora-$(cat /etc/fedora-release | cut -d' ' -f 3)-"
+        url="https://repo.protonvpn.com/fedora-$(cut -d' ' -f 3 /etc/fedora-release )-"
         app='protonvpn-stable-release-1.0.3-1.noarch.rpm'
         sudo dnf -q -y install "${url}${app}" && sudo dnf -q -y --refresh install proton-vpn-gnome-desktop
 
