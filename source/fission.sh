@@ -182,7 +182,7 @@ BATTERY
 }
 
 tweak_git() {
-    is_installed 'git' || return 0
+    is_installed 'git' && reply_yes 'Configure Git settings?' || return 0
 
     git config --global init.defaultBranch main
     printf '%s\n' 'Default git branch set to main'
@@ -210,7 +210,7 @@ tweak_git() {
 }
 
 tweak_gnome() {
-    is_installed 'gsettings' || return 0
+    is_installed 'gsettings' && reply_yes 'Confiugure gnome settings?' || return 0
 
     if is_installed 'gnome-shell'; then
         gsettings set org.gnome.shell app-picker-layout '[]'
@@ -234,6 +234,8 @@ tweak_gnome() {
 }
 
 tweak_text_editor() {
+    reply_yes 'Configure text editor settings?' || return 0
+
     if is_installed 'gnome-text-editor' && ! is_installed 'gedit'; then
         gsettings set org.gnome.TextEditor show-line-numbers true
         printf '%s\n' 'Text editor shows line numbers'
@@ -349,17 +351,6 @@ install_master_pdf_editor() {
         return 0
     fi
 
-    # code used to install before remote repository was available
-    # url='https://code-industry.net/public/'
-    # app="master-pdf-editor-5.9.82-qt5.$(arch)"
-    # if [ "$USE_DNF" = 'True' ]; then
-    #     sudo dnf -q -y install "${url}${app}.rpm"
-    # elif [ "$USE_APT" = 'True' ] && wget -q "${url}${app}.deb"; then
-    #     sudo apt-get -qq --option "$WAIT_APT" install "./${app}.deb"
-    #     rm --force -- "${app}.deb"
-    # fi
-
-    # can now install from remote repository
     # https://code-industry.net/package-installation-from-remote-repository/
     url='http://repo.code-industry.net/'
     if [ "$USE_DNF" = 'True' ]; then
@@ -435,21 +426,14 @@ install_media_codecs() {
         else
             sudo dnf config-manager --enable fedora-cisco-openh264
         fi
-        sudo dnf update @core # show rpm fusion repositories in software GUI
+        sudo dnf update @core
+        if [ "$fedora_version" -ge 41 ]; then
+            sudo dnf install rpmfusion-\*-appstream-data
+        fi
 
         # https://rpmfusion.org/Howto/Multimedia
         sudo dnf -y swap ffmpeg-free ffmpeg --allowerasing
         sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
-        # sudo dnf -y install ffmpeg-libs gstreamer1-plugin-libav gstreamer1-plugins-base 'gstreamer1-plugins-good-*'
-        # The following comment is out of date, but kept for documentation.
-        # https://docs.fedoraproject.org/en-US/quick-docs/assembly_installing-plugins-for-playing-movies-and-music/
-        # Although recommended in the link above, we forgo installing the packages listed below.
-        # 1. 'Multimedia' group no longer exists.
-        # 2. 'lame*' mp3 patents expired in 2016, allowing Fedora to ship with mp3 support
-        # 3. 'gstreamer1-libav' replaced with 'gstreamer1-plugin-libav' in fedora 37+ repo
-        # 4. 'gstreamer1-plugins-ugly-*' use VLC media player instead to avoid licensing issues
-        # 5. 'gstreamer1-plugins-bad-*' use VLC to play media which needs such codecs instead of these bad quality plugins
-        # 6. 'gstreamer1-plugin-openh264' Cisco's H.264 codec has awful performance compared to ffmpeg's
 
         printf '\n%s %s%s%s\n\n' 'For hardware acceleration drivers, see' \
             "$CYAN" 'https://rpmfusion.org/Howto/Multimedia' "$NORMAL"
@@ -472,9 +456,6 @@ install_miniconda() {
     app="Miniconda3-latest-Linux-$(arch).sh"
     wget -q "https://repo.anaconda.com/miniconda/$app" && bash "$app"
     rm --force -- "$app"
-    # alternatives (not recommended)
-    # dnf install conda
-    # https://conda.io/projects/conda/en/latest/user-guide/install/rpm-debian.html
 }
 
 # https://extensions.gnome.org/extension/2236/night-theme-switcher/
@@ -585,25 +566,24 @@ install_apps() {
      6) Bitwarden               password manager
      7) Discord                 messaging (proprietary)
      8) Extensions              manage Gnome extensions
-     9) Flatseal                manage flatpak permissions
-    10) Foliate                 ebook viewer
-    11) Gimp                    image editor
-    12) Kdenlive                video editor
-    13) Signal                  messaging (open source, encrypted)
-    14) Slack                   messaging (proprietary)
-    15) VLC                     reliable media player
-    16) VS Codium               code editor
-    17) Master PDF editor       portable document format file editor
-    18) Matlab                  scientific computing software
-    19) Miniconda               programming environment and package manager
-    20) Night theme switcher    automatically toggle light and dark theme
-    21) Proton VPN              virtual private network
-    22) Wolfram                 scientific computing software
-    23) Zotero                  reference manager
+     9) Foliate                 ebook viewer
+    10) Gimp                    image editor
+    11) Kdenlive                video editor
+    12) Signal                  messaging (open source, encrypted)
+    13) Slack                   messaging (proprietary)
+    14) VLC                     reliable media player
+    15) VS Codium               code editor
+    16) Master PDF editor       portable document format file editor
+    17) Matlab                  scientific computing software
+    18) Miniconda               programming environment and package manager
+    19) Night theme switcher    automatically toggle light and dark theme
+    20) Proton VPN              virtual private network
+    21) Wolfram                 scientific computing software
+    22) Zotero                  reference manager
 
 INSTALL_LIST
 
-    install_media_codecs # do first
+    install_media_codecs
 
     if [ "$USE_DNF" = 'True' ]; then
         if ! is_installed 'snap' 'chromium'; then
@@ -619,7 +599,6 @@ INSTALL_LIST
         reply_yes 'Install uBlock Origin?' && sudo apt-get --option "$WAIT_APT" install webext-ublock-origin-firefox
     fi
 
-    # flatpak and snap provide sandboxing, making them more secure than rpm or deb
     if [ "$USE_FLAT" = 'True' ]; then
         reply_yes 'Add Flathub repository? (required for flatpak)' \
             && sudo flatpak remote-add --if-not-exists flathub 'https://flathub.org/repo/flathub.flatpakrepo' \
@@ -627,7 +606,6 @@ INSTALL_LIST
         reply_yes 'Install Bitwarden?'  && flatpak install flathub com.bitwarden.desktop
         reply_yes 'Install Discord?'    && flatpak install flathub com.discordapp.Discord
         reply_yes 'Install Extensions?' && flatpak install flathub org.gnome.Extensions
-        reply_yes 'Install Flatseal?'   && flatpak install flathub com.github.tchx84.Flatseal
         reply_yes 'Install Foliate?'    && flatpak install flathub com.github.johnfactotum.Foliate
         reply_yes 'Install Gimp?'       && flatpak install flathub org.gimp.GIMP
         reply_yes 'Install Kdenlive?'   && flatpak install flathub org.kde.kdenlive
