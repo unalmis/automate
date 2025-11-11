@@ -4,6 +4,15 @@ Below is a collection of tips and guides that may be useful.
 
 ---
 
+## Fedora post-upgrade tasks
+
+To upgrade to packages introduced in new major versions type the following in the terminal.
+```sh
+sudo dnf group upgrade workstation-product-environment
+```
+
+- [Additional post-upgrade tasks](https://docs.fedoraproject.org/en-US/quick-docs/upgrading-fedora-offline/#sect-optional-post-upgrade-tasks)
+
 ## Nvidia drivers with secure boot on Fedora 36+
 
 This guide is based on the following sources.
