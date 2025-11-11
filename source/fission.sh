@@ -221,6 +221,8 @@ tweak_gnome() {
     gsettings set org.gnome.desktop.privacy remove-old-trash-files true
     gsettings set org.gnome.desktop.privacy remove-old-temp-files true
     printf '%s\n' 'Trash and temporary file retention reduced to 30 days'
+    gsettings set org.gnome.desktop.screensaver restart-enabled true
+    printf '%s\n' 'Shutdown from lock screen enabled'
 
     button_layout=$(gsettings get org.gnome.desktop.wm.preferences button-layout)
     if [ "$button_layout" = "'appmenu:close'" ]; then
@@ -476,12 +478,12 @@ install_night_theme_switcher() {
     is_installed 'gnome-extensions' && reply_yes 'Install Night theme switcher?' || return 0
 
     gnome_version=$(gnome-extensions version | cut --characters -2)
-    if [ "$gnome_version" -eq 48 ] 2>/dev/null; then
+    if [ "$gnome_version" -eq 49 ] 2>/dev/null; then
+        app_version='80'
+    elif [ "$gnome_version" -eq 48 ] 2>/dev/null; then
         app_version='79'
     elif [ "$gnome_version" -eq 47 ] 2>/dev/null; then
         app_version='78'
-    elif [ "$gnome_version" -eq 46 ] 2>/dev/null; then
-        app_version='77'
     else
         return 1
     fi
