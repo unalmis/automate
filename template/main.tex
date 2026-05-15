@@ -1,0 +1,424 @@
+\documentclass{report} % another option is article
+
+% ------------------------- package loading --------------------------
+\usepackage[
+   textwidth=14.5cm,
+   top=2cm,
+   bottom=2cm,
+]{geometry}
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+% see xcolor documentation for package loading order
+\usepackage[dvipsnames]{xcolor}
+% load after xcolor
+\usepackage{listings}
+\usepackage{csquotes}
+% load after csquotes
+\usepackage{biblatex}
+
+% load before math related package if using theorems option
+\usepackage{tcolorbox}
+
+% math packages
+\usepackage{diffcoeff}
+\usepackage{mathtools}
+% load after mathtools (which loads amsmath)
+\usepackage{amsthm}
+% load after any other maths or font-related package
+\usepackage[
+    math-style=ISO,
+    warnings-off={mathtools-colon, mathtools-overbracket},
+]{unicode-math}
+
+% load after most packages, in particular after font-related packages
+% makes things look better, apparently
+\usepackage{microtype}
+
+% ------------------------- begin stuff from other template -------------------------
+
+% --- project-specific packages ---
+\usepackage{enumitem}
+%\usepackage{subcaption}
+\usepackage{multicol}
+\usepackage{thmtools}
+\usepackage{xstring} % for ifstringeq
+\usepackage[framemethod=TikZ]{mdframed}
+
+\mdfsetup{skipabove=1em,skipbelow=0em}
+\numberwithin{equation}{section}
+
+% --- project-specific notation from other template ---
+\providecommand{\N}{\ensuremath{\mathbb{N}}}
+\providecommand{\R}{\ensuremath{\mathbb{R}}}
+\providecommand{\Z}{\ensuremath{\mathbb{Z}}}
+\providecommand{\Q}{\ensuremath{\mathbb{Q}}}
+\providecommand{\C}{\ensuremath{\mathbb{C}}}
+\providecommand{\E}{\mathbb{E}}
+\providecommand{\Pbb}{\mathbb{P}}
+\providecommand{\Var}{\operatorname{Var}}
+\providecommand{\Law}{\operatorname{Law}}
+\providecommand{\cF}{\mathcal{F}}
+\providecommand{\cG}{\mathcal{G}}
+\providecommand{\cH}{\mathcal{H}}
+\providecommand{\cB}{\mathcal{B}}
+\providecommand{\cP}{\mathcal{P}}
+\providecommand{\cL}{\mathcal{L}}
+\providecommand{\toP}{\xrightarrow{P}}
+\providecommand{\toas}{\xrightarrow{\mathrm{a.s.}}}
+\providecommand{\tod}{\xrightarrow{d}}
+\providecommand{\toLp}{\xrightarrow{L^p}}
+\providecommand{\weakto}{\Rightarrow}
+\providecommand{\Unif}{\mathrm{Unif}}
+\providecommand{\Ber}{\mathrm{Ber}}
+\providecommand{\Exp}{\mathrm{Exp}}
+\providecommand{\Normal}{\mathcal{N}}
+\providecommand{\1}{\mathbf{1}}
+\providecommand{\dd}{\,\mathrm{d}}
+\providecommand{\mat}[1]{\mathbf{#1}}
+\providecommand{\Om}{\Omega}
+\providecommand{\Gam}{\Gamma}
+\providecommand{\Sig}{\Sigma}
+\providecommand{\BV}{\mathrm{BV}}
+\providecommand{\loc}{\mathrm{loc}}
+\providecommand{\Id}{\mathrm{Id}}
+\providecommand{\dS}{\,\mathrm{d}S}
+\providecommand{\dV}{\,\mathrm{d}V}
+\providecommand{\dt}{\Delta t}
+\providecommand{\dx}{\Delta x}
+\providecommand{\DtN}{\mathrm{DtN}}
+\providecommand{\NtD}{\mathrm{NtD}}
+\providecommand{\Real}{\operatorname{Re}}
+\providecommand{\Imag}{\operatorname{Im}}
+\providecommand{\sech}{\operatorname{sech}}
+\providecommand{\cT}{\mathcal{T}}
+\providecommand{\cE}{\mathcal{E}}
+\providecommand{\cN}{\mathcal{N}}
+\providecommand{\cV}{\mathcal{V}}
+\providecommand{\cM}{\mathcal{M}}
+\providecommand{\cA}{\mathcal{A}}
+\providecommand{\cD}{\mathcal{D}}
+\providecommand{\cR}{\mathcal{R}}
+\providecommand{\cI}{\mathcal{I}}
+\providecommand{\bfx}{\mathbf{x}}
+\providecommand{\bfy}{\mathbf{y}}
+\providecommand{\bfn}{\mathbf{n}}
+\providecommand{\bfX}{\mathbf{X}}
+\providecommand{\bfZ}{\mathbf{Z}}
+\providecommand{\flux}{J_\Gamma}
+\providecommand{\Ocal}{\mathcal{O}}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\erfc}{erfc}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\dist}{dist}
+
+\definecolor{correct}{HTML}{009900}
+\providecommand\correct[2]{\ensuremath{\:}{\color{red}{#1}}\ensuremath{\to }{\color{correct}{#2}}\ensuremath{\:}}
+\providecommand\green[1]{{\color{correct}{#1}}}
+\providecommand\hr{\noindent\rule[0.5ex]{\linewidth}{0.5pt}}
+\providecommand\hide[1]{}
+\providecommand\contra{\scalebox{1.1}{$\lightning$}}
+
+\theoremstyle{definition}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{ForestGreen!70!black},
+    bodyfont=\normalfont,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=ForestGreen,
+        backgroundcolor=ForestGreen!5,
+    }
+]{thmgreenbox}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{NavyBlue!70!black},
+    bodyfont=\normalfont,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=NavyBlue,
+        backgroundcolor=NavyBlue!5,
+    }
+]{thmbluebox}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{NavyBlue!70!black},
+    bodyfont=\normalfont,
+    numbered=no,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=NavyBlue,
+    }
+]{thmblueline}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{RawSienna!70!black},
+    bodyfont=\normalfont,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=RawSienna,
+        backgroundcolor=RawSienna!5,
+    }
+]{thmredbox}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{RawSienna!70!black},
+    bodyfont=\normalfont,
+    numbered=no,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=RawSienna,
+        backgroundcolor=RawSienna!1,
+    },
+    qed=\qedsymbol,
+]{thmproofbox}
+
+\declaretheoremstyle[
+    headfont=\bfseries\sffamily\color{NavyBlue!70!black},
+    bodyfont=\normalfont,
+    numbered=no,
+    mdframed={
+        linewidth=2pt,
+        rightline=false,
+        topline=false,
+        bottomline=false,
+        linecolor=NavyBlue,
+        backgroundcolor=NavyBlue!1,
+    },
+]{thmexplanationbox}
+
+\declaretheorem[style=thmredbox, name=Theorem]{theorem}
+\declaretheorem[style=thmredbox, name=Lemma]{lemma}
+\declaretheorem[style=thmredbox, name=Proposition]{prop}
+\declaretheorem[style=thmredbox, numbered=no, name=Corollary]{corollary}
+\declaretheorem[style=thmgreenbox, name=Definition]{definition}
+\declaretheorem[style=thmgreenbox, name=Assumption]{assumption}
+\declaretheorem[style=thmbluebox, numbered=no, name=Example]{eg}
+\declaretheorem[style=thmredbox, name=Problem]{problem}
+\declaretheorem[style=thmblueline, numbered=no, name=Remark]{remark}
+\declaretheorem[style=thmblueline, numbered=no, name=Note]{note}
+\declaretheorem[style=thmproofbox, name=Proof]{replacementproof}
+\declaretheorem[style=thmexplanationbox, name=Explanation]{tmpexplanation}
+
+\providecommand{\lemmaautorefname}{Lemma}
+\providecommand{\definitionautorefname}{Definition}
+\providecommand{\problemautorefname}{Problem}
+\providecommand{\propautorefname}{Proposition}
+\providecommand{\assumptionautorefname}{Assumption}
+\providecommand{\replacementproofautorefname}{Proof}
+\providecommand{\tmpexplanationautorefname}{Explanation}
+
+\NewDocumentCommand{\thmProjectProofStart}{m}{%
+    \vspace{-10pt}%
+    \IfStrEq{#1}{\proofname}{%
+        \begin{replacementproof}%
+    }{%
+        \begin{replacementproof}[#1]%
+    }%
+}
+\NewDocumentCommand{\thmProjectProofStop}{}{\end{replacementproof}}
+\NewDocumentCommand{\thmProjectExplanationStart}{m}{%
+    \vspace{-10pt}%
+    \IfBlankTF{#1}{\begin{tmpexplanation}}{\begin{tmpexplanation}[#1]}%
+}
+\NewDocumentCommand{\thmProjectExplanationStop}{}{\end{tmpexplanation}}
+
+\makeatletter
+\newcommand{\@exercise}{}
+\NewDocumentCommand{\exercise}{m}{%
+    \gdef\@exercise{#1}%
+    \subsection*{Exercise #1}%
+}
+\NewDocumentCommand{\subexercise}{m}{%
+    \subsubsection*{Exercise \@exercise.#1}%
+}
+\NewDocumentCommand{\lesson}{m m m}{%
+    \IfBlankTF{#3}{%
+        \gdef\@lesson{Lecture #1}%
+    }{%
+        \gdef\@lesson{Lecture #1: #3}%
+    }%
+    \subsection*{\@lesson}%
+}
+\makeatother
+
+\RenewDocumentEnvironment{proof}{O{\proofname}}%
+    {\thmProjectProofStart{#1}}%
+    {\thmProjectProofStop}
+\NewDocumentEnvironment{solution}{}{\begin{proof}[Solution]}{\end{proof}}
+\NewDocumentEnvironment{explanation}{O{}}{\thmProjectExplanationStart{#1}}{\thmProjectExplanationStop}
+
+% ------------------------- end stuff from other template -------------------------
+% load after most packages, in particular after biblatex, graphicx
+%\usepackage{subfiles}
+
+% almost always load last
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    pdfauthor={},
+    pdfdisplaydoctitle=true,
+    pdfpagemode=UseOutlines,
+    pdftitle={},
+}
+
+% ------------------------ document settings -------------------------
+% elevate missing character warnings to errors
+\tracinglostchars=3
+
+% --- code listings ---
+\definecolor{AlmostWhite}{gray}{0.98}
+\lstset{
+    basicstyle={\ttfamily \scriptsize},
+    breaklines=true,
+    captionpos=b,
+    columns=fullflexible,
+    emptylines=1,
+    % float, % can add this inside options of individual listings
+    keepspaces=true,
+    language=Python,
+    numberblanklines=false,
+    numbers=left,
+    numberstyle=\tiny,
+    showstringspaces=false,
+    upquote=true,
+    % syntax highlighting
+    backgroundcolor=\color{AlmostWhite},
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{teal},
+}
+
+% --- math commands ---
+% begin patch for unicode-math bug
+% https://tex.stackexchange.com/questions/547584/unicode-math-swallows-my-backslash
+\AtBeginDocument{\RenewDocumentCommand{\setminus}{}{\smallsetminus}}
+% end patch for unicode-math bug
+
+% --- universal constants (not variables) ---
+\NewDocumentCommand{\e}{}{\symrm{e}}
+\NewDocumentCommand{\im}{}{\symrm{i}}
+\NewDocumentCommand{\cpi}{}{\symrm{\pi}}
+
+% --- common math notation ---
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\group}{\lparen}{\rparen}
+\DeclarePairedDelimiter{\groupbrack}{\lbrack}{\rbrack}
+% see mathtools package section 3.6 for explanation of the below set command
+% just to make sure it exists
+\ProvideDocumentCommand{\given}{}{}
+% can be useful to refer to this outside \set
+\NewDocumentCommand{\setSymbol}{o}{
+    \mathchoice{\:}{\:}{\,}{\,}\IfValueT{#1}{#1}\vert
+    \allowbreak
+    \mathchoice{\:}{\:}{\,}{\,}
+    \mathopen{}}
+\DeclarePairedDelimiterX{\set}[1]{\lbrace}{\rbrace}{%
+    \RenewDocumentCommand{\given}{}{\setSymbol[\delimsize]}
+    #1
+}
+% intervals
+\DeclarePairedDelimiterX{\closeint}[2]{\lbrack}{\rbrack}{#1, #2}
+\DeclarePairedDelimiterX{\openint}[2]{\lparen}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\clopenint}[2]{\lbrack}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\openclint}[2]{\lparen}{\rbrack}{#1, #2}
+% inner product
+\DeclarePairedDelimiterX{\innerp}[2]{\langle}{\rangle}{#1, #2}
+% sign function
+\DeclareMathOperator{\sign}{sign}
+% natural numbers from 1 to given argument
+\NewDocumentCommand{\nats}{m}{\symbb{N} \cap \closeint{1}{#1}}
+% integers from 0 to given argument
+\NewDocumentCommand{\ints}{m}{\symbb{Z} \cap \closeint{0}{#1}}
+
+% --- linear algebra ---
+% transpose
+\NewDocumentCommand{\trans}{m}{{#1}^{\mathsf{T}}}
+% Hermitian (conjugate) transpose
+\NewDocumentCommand{\herm}{m}{{#1}^{\mathsf{H}}}
+% image of argument (subset of codomain)
+\DeclareMathOperator{\image}{image}
+% rank of matrix
+\DeclareMathOperator{\rank}{rank}
+% dimension of kernel
+\DeclareMathOperator{\nullity}{nullity}
+% sum of diagonal of matrix
+\DeclareMathOperator{\trace}{trace}
+% diagonal matrix of argument
+\DeclareMathOperator{\diag}{diag}
+% bold vectors
+\AtBeginDocument{\RenewDocumentCommand{\vec}{m}{\symbf{#1}}}
+
+% --- probability ---
+\NewCommandCopy{\PrSymbol}{\Pr}
+\RenewDocumentCommand{\Pr}{som}{\PrSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+% expectation
+\DeclareMathOperator*{\ExSymbol}{Ex}
+\NewDocumentCommand{\Ex}{som}{\ExSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+% covariance
+\DeclareMathOperator*{\CovSymbol}{Cov}
+\NewDocumentCommand{\Cov}{som}{\CovSymbol \IfValueT{#2}{_{#2}} \IfBooleanTF{#1}{\groupbrack*{#3}}{\groupbrack{#3}}}
+
+% --- common operators in machine learning ---
+% boolean indicator function, 1 if given argument is true and 0 otherwise
+\NewDocumentCommand{\bool}{m}{\symbb{1}_{#1}}
+% risk or error, defined as expectation of loss function
+\NewDocumentCommand{\risk}{sO{\symcal{D}}om}{L\IfValueT{#3}{^{\text{#3}}}_{#2} \IfBooleanTF{#1}{\group*{#4}}{\group{#4}}}
+% hypothesis class
+\NewDocumentCommand{\hypo}{O{H}}{\symcal{#1}}
+% positive function, like sign function but not ambiguous for zero
+\DeclareMathOperator{\pos}{pos}
+% VC-dimension
+\DeclareMathOperator{\vcdim}{VCdim}
+\DeclareMathOperator{\softargmax}{s_{argmax}}
+
+% --- complex analysis ---
+% residue
+\DeclareMathOperator{\res}{res}
+
+% ------------------------- document content -------------------------
+%\NewTColorBox{readbox}{}{title=Read}
+\RenewDocumentCommand{\chaptername}{}{}
+%\addbibresource{\subfix{citation.bib}}
+%\pagestyle{myheadings}
+%\markright{\hfill}
+\author{}
+\title{}
+\date{\today}
+%\AtBeginDocument{\RenewDocumentCommand{\abstractname}{}{Preface}}
+
+\begin{document}
+
+\pagenumbering{roman}
+\maketitle
+%\subfile{copyright}
+\tableofcontents
+%\lstlistoflistings
+%\printbibliography
+\clearpage
+\pagenumbering{arabic}
+
+%\input or \subfile
+\appendix
+
+\end{document}

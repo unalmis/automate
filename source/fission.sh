@@ -634,7 +634,6 @@ INSTALL_LIST
         reply_yes 'Install ms-python.debugpy?' && codium --install-extension ms-python.debugpy
         reply_yes 'Install Ruff?'              && codium --install-extension charliermarsh.ruff
         reply_yes 'Install ShellCheck?'        && codium --install-extension timonwong.shellcheck
-        reply_yes 'Install LaTeX Workshop?'    && codium --install-extension james-yu.latex-workshop
         reply_yes 'Install GitHub themes?'     && codium --install-extension github.github-vscode-theme
         reply_yes 'Install spell checker?'     && codium --install-extension streetsidesoftware.code-spell-checker
     fi
