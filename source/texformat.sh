@@ -34,7 +34,7 @@ if reply_yes 'Delete the printed files?'; then
 fi
 
 
-find . -type f '(' -name '*.aux' -o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.log' -o -name '*.lol' -o -name '*.out' -o -name '*.run.xml' -o -name '*.synctex.gz' -o -name '*.toc' ')' -print
+find . -type f '(' -name '*.aux' -o -name '*.fls' -o -name '*.xdv' -o -name '*.fdb_latexmk' -o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.log' -o -name '*.lol' -o -name '*.out' -o -name '*.run.xml' -o -name '*.synctex.gz' -o -name '*.toc' ')' -print
 if reply_yes 'Delete the printed files?'; then
-    find . -type f '(' -name '*.aux' -o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.log' -o -name '*.lol' -o -name '*.out' -o -name '*.run.xml' -o -name '*.synctex.gz' -o -name '*.toc' ')' -delete
+    find . -type f '(' -name '*.aux'  -o -name '*.fls' -o -name '*.xdv' -o -name '*.fdb_latexmk' -o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.log' -o -name '*.lol' -o -name '*.out' -o -name '*.run.xml' -o -name '*.synctex.gz' -o -name '*.toc' ')' -delete
 fi
