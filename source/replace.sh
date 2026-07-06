@@ -13,4 +13,11 @@ read -r regexp
 printf 'Enter the replacement string: '
 read -r replacement
 
-find . -type f -execdir sed --in-place "s/${regexp}/${replacement}/g" '{}' '+'
+case "$(uname -s)" in
+    Darwin)
+        find . -type f -execdir sed -i '' "s/${regexp}/${replacement}/g" '{}' '+'
+        ;;
+    *)
+        find . -type f -execdir sed --in-place "s/${regexp}/${replacement}/g" '{}' '+'
+        ;;
+esac

@@ -7,8 +7,19 @@
 # @description  Back up (restore) files to (from) your archive
 # ------------------------------------------------------------------------------
 
-# TODO: Some systems mount drives under '/media' instead of '/run/media'.
-ARCHIVE_PREFIX="/run/media/${USER}/"
+case "$(uname -s)" in
+    Darwin)
+        ARCHIVE_PREFIX="/Volumes/"
+        ;;
+    *)
+        # Some Linux systems mount drives under '/media' instead of '/run/media'.
+        if [ -d "/run/media/${USER}" ]; then
+            ARCHIVE_PREFIX="/run/media/${USER}/"
+        else
+            ARCHIVE_PREFIX="/media/${USER}/"
+        fi
+        ;;
+esac
 
 # output text settings
 NORMAL=$(tput sgr0)
@@ -61,6 +72,12 @@ archive() {
     # deletes files in the 2nd directory if they don't exist in the 1st
     # remove '--delete-excluded' to avoid this
     # note that --include='.git' should always be paired with --delete
+    if rsync --help 2>/dev/null | grep -q -- '--info='; then
+        progress='--info=progress2'
+    else
+        progress='--progress'
+    fi
+
     if reply_yes 'Dry run?'; then
         rsync --dry-run --verbose --itemize-changes \
             --archive --no-D --prune-empty-dirs \
@@ -69,7 +86,7 @@ archive() {
     else
         rsync --archive --no-D --prune-empty-dirs \
             --delete-excluded --include='.git' --exclude='.*' \
-            --info=progress2 --human-readable -- "$1" "$2"
+            "$progress" --human-readable -- "$1" "$2"
     fi
 }
 
