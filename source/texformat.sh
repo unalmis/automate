@@ -26,6 +26,8 @@ reply_yes() {
 
 # ------------------------------------------------------------------------------
 
+# export PERL5LIB="$HOME/perl5/lib/perl5${PERL5LIB:+:$PERL5LIB}"
+
 find . -type f -name '*.tex' -execdir latexindent -w -s '{}' '+'
 find . -type f '(' -name '*.bak*' -o -name 'indent.log' ')' -print
 

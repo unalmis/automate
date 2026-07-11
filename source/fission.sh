@@ -23,6 +23,14 @@ USE_APT='False'
 USE_FLAT='False'
 USE_SNAP='False'
 
+# Fedora Silverblue has an immutable base system. Host packages and repositories
+# should not be managed with dnf, even when the command is available.
+IS_SILVERBLUE='False'
+if grep -q -e '^VARIANT_ID=silverblue$' \
+        -e '^VARIANT_ID="silverblue"$' '/etc/os-release' 2>/dev/null; then
+    IS_SILVERBLUE='True'
+fi
+
 # Only one apt process at a time should be live.
 # A timeout set to -1 seconds will wait for a live apt process to finish.
 # @citation Chris Sinjakli,
@@ -89,7 +97,13 @@ is_installed() {
 
 # set priority for the duration of this program to avoid conflicts
 set_manager_priority() {
-    is_installed 'dnf' && USE_DNF='True'
+    if [ "$IS_SILVERBLUE" = 'True' ]; then
+        # Use Flatpak/conda instead of modifying Silverblue's immutable base.
+        USE_DNF='False'
+        printf '%s\n' 'Fedora Silverblue detected; skipping dnf operations.'
+    else
+        is_installed 'dnf' && USE_DNF='True'
+    fi
     is_installed 'apt' && USE_APT='True'
     if [ "$USE_DNF" = 'True' ] && [ "$USE_APT" = 'True' ]; then
         if reply_yes 'Detected two package managers. Use dnf instead of apt?'; then
@@ -271,7 +285,10 @@ tweak_settings() {
 
 # upgrade dnf or apt, flatpak or snap, conda, and firmware
 upgrade_system() {
-    if [ "$USE_DNF" = 'True' ]; then
+    if [ "$IS_SILVERBLUE" = 'True' ]; then
+        # rpm-ostree is the supported way to update Silverblue's base image.
+        sudo rpm-ostree upgrade
+    elif [ "$USE_DNF" = 'True' ]; then
         sudo dnf --refresh upgrade
         sudo dnf autoremove
     elif [ "$USE_APT" = 'True' ]; then
@@ -456,7 +473,15 @@ install_miniconda() {
     fi
 
     app="Miniconda3-latest-Linux-$(arch).sh"
-    wget -q "https://repo.anaconda.com/miniconda/$app" && bash "$app"
+    if wget -q "https://repo.anaconda.com/miniconda/$app" && bash "$app"; then
+        # The installer initializes conda for future shells, but its executable
+        # is not yet available in the current shell's PATH.
+        if [ -x "${HOME}/miniconda3/bin/conda" ]; then
+            "${HOME}/miniconda3/bin/conda" config --set auto_activate_base false
+        elif is_installed 'conda'; then
+            conda config --set auto_activate_base false
+        fi
+    fi
     rm --force -- "$app"
 }
 
